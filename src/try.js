@@ -26,14 +26,6 @@ a.btn.alt{background:transparent;color:var(--accent);border:2px solid var(--acce
 a.btn,button{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:6px;padding:10px 16px;font:600 15px system-ui;text-decoration:none;cursor:pointer;justify-self:start}
 button:disabled{opacity:.6;cursor:wait}
 input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:14px ui-monospace,Menlo,monospace}
-.looks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-@media (max-width:520px){.looks{grid-template-columns:repeat(2,1fr)}}
-.looks label{position:relative;border:2px solid var(--line);border-radius:8px;cursor:pointer;overflow:hidden;display:grid;font-size:14px;text-align:center}
-.looks label span{padding:6px}.looks input{position:absolute;opacity:0}
-.looks label:has(input:checked){border-color:var(--accent);color:var(--accent);font-weight:600}
-.looks label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
-.pv{height:150px;overflow:hidden;position:relative;border-bottom:1px solid var(--line)}
-.pv iframe{width:400%;height:400%;border:0;transform:scale(.25);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0}
 .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-decoration:none;font:700 18px system-ui;letter-spacing:-.01em}
 #err{color:var(--bad)}small{font-size:13px}
 ${intro ? `${DIAGRAM_CSS}
@@ -72,8 +64,7 @@ ${intro ? '' : `<a href="/" class="brand">${LOGO}<span>CF Cost</span></a>`}
 <a class="btn" href="${TOKEN_URL}" target="_blank" rel="noopener">Create token on Cloudflare ↗</a></li>
 <li><b>2 · Paste it</b><form id="f" style="display:grid;gap:10px">
 <input id="tok" type="password" autocomplete="off" spellcheck="false" placeholder="Paste token" required>
-<div class="looks">${['exploded', 'ledger', 'terminal', 'receipt'].map((t, i) => `<label><input type="radio" name="t" value="${t}"${i ? '' : ' checked'}><div class="pv"><iframe src="/try/demo?t=${t}&thumb=1" loading="lazy" tabindex="-1" aria-hidden="true" title=""></iframe></div><span>${t[0].toUpperCase() + t.slice(1)}</span></label>`).join('')}</div>
-<small class="dim">Pick a look. <a href="/try/demo" target="_blank" style="color:var(--accent)">See a full sample ↗</a> · <a href="/brian" style="color:var(--accent)">No token yet? See Brian's real bill →</a></small>
+<input type="hidden" name="t" value="exploded">
 <button id="go">Show my bill</button><p id="err" role="alert"></p></form></li>
 </ol>
 <section style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:10px">
@@ -95,7 +86,7 @@ ${intro.printer ? intro.printer.js : ''}
 document.getElementById('yoursBtn').onclick=()=>{m.hidden=false;m.scrollIntoView({behavior:'smooth'});setTimeout(()=>document.getElementById('tok').focus({preventScroll:true}),400)};})();` : ''}
 const K='cfcost_token',f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');
 const t0=new URLSearchParams(location.search).get('t');
-if(t0){const r=f.querySelector('input[value="'+t0+'"]');if(r)r.checked=true}
+if(t0&&/^(exploded|ledger|terminal|receipt)$/.test(t0))f.t.value=t0;
 async function show(tok,t){
   go.disabled=true;go.textContent='Reading your bill…';err.textContent='';
   try{
