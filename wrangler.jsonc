@@ -2,6 +2,8 @@
   "name": "cf-cost",
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
-  "vars": { "TEMPLATE": "ledger" }
+  "vars": { "TEMPLATE": "ledger" },
+  // /try/render: 10 renders per minute per IP
+  "ratelimits": [{ "name": "TRY_LIMIT", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } }]
   // secrets: CF_BILLING_TOKEN, DASH_PASSWORD. Optional var CF_ACCOUNT_ID if the token sees several accounts.
 }

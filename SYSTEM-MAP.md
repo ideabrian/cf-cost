@@ -4,7 +4,7 @@ Stack: one Cloudflare Worker (no framework, no DB). Live reads from CF billing A
 
 Public routes (no auth):
 - `/try` — onboarding: pre-filled token link → paste token → pick look → dashboard. Token in sessionStorage only.
-- `POST /try/render?t=` — header `X-CF-Token`; renders dashboard with visitor's token. Not stored/logged; guest account lookup not cached.
+- `POST /try/render?t=` — header `X-CF-Token`; rate-limited 10/min/IP (binding TRY_LIMIT, approximate); renders dashboard with visitor's token. Not stored/logged; guest account lookup not cached.
 
 Owner routes (Basic auth, any username, password = DASH_PASSWORD):
 - `/` — HTML: plans, overage this period, 12-mo invoiced, invoices by month, every usage meter vs included, invoice list

@@ -136,7 +136,8 @@ const html = (b, status = 200) => new Response(b, { status, headers: { 'content-
 const FORGET = `<p style="text-align:center;font:13px system-ui;opacity:.75;padding:0 16px 32px">Your token lives only in this tab. <a href="/try" onclick="try{sessionStorage.removeItem('cfcost_token')}catch{}" style="color:inherit">Forget it</a></p>`;
 
 // One render for a visitor's own token. Token arrives in a header, is used for this request only, never logged or stored.
-async function guest(req) {
+async function guest(req, env) {
+  if (env.TRY_LIMIT && !(await env.TRY_LIMIT.limit({ key: req.headers.get('cf-connecting-ip') || 'x' })).success) return new Response('Too many tries. Wait a minute.', { status: 429 });
   const tok = req.headers.get('X-CF-Token') || '';
   if (req.method !== 'POST' || !/^[\w-]{20,200}$/.test(tok)) return new Response("That doesn't look like a Cloudflare API token.", { status: 400 });
   try {
@@ -153,7 +154,7 @@ export default {
     const path = new URL(req.url).pathname;
     if (path === "/favicon.ico") return new Response(null, { status: 204 });
     if (path === "/try") return html(tryPage());
-    if (path === "/try/render") return guest(req);
+    if (path === "/try/render") return guest(req, env);
     if (!authed(req, env)) return new Response("Login required", { status: 401, headers: { "WWW-Authenticate": "Basic realm=\"cf-cost\"" } });
     const url = new URL(req.url);
     try {
