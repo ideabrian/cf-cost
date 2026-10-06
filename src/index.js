@@ -3,14 +3,24 @@ import { summarize } from "./lib.js";
 import ledger from "./templates/ledger.js";
 import terminal from "./templates/terminal.js";
 import receipt from "./templates/receipt.js";
+import tryPage from "./try.js";
 
 const TEMPLATES = { ledger, terminal, receipt };
 const API = 'https://api.cloudflare.com/client/v4/accounts/';
 
 // Account comes from CF_ACCOUNT_ID, or the first account the token can see.
+// Guest (/try) lookups are never cached: the module-level cache is shared across requests.
 let acct;
 async function accountId(env) {
   if (env.CF_ACCOUNT_ID) return env.CF_ACCOUNT_ID;
+  if (env.guest) {
+    if (!env.acct) {
+      const j = await (await fetch("https://api.cloudflare.com/client/v4/accounts", { headers: { Authorization: "Bearer " + env.CF_BILLING_TOKEN } })).json();
+      env.acct = j.result?.[0]?.id;
+      if (!env.acct) throw new Error("That token can't see any account. Check it was copied fully and has Billing Read.");
+    }
+    return env.acct;
+  }
   if (!acct) {
     const j = await (await fetch("https://api.cloudflare.com/client/v4/accounts", { headers: { Authorization: "Bearer " + env.CF_BILLING_TOKEN } })).json();
     acct = j.result?.[0]?.id;
@@ -91,9 +101,29 @@ function authed(req, env) {
   return crypto.subtle.timingSafeEqual(a, b);
 }
 
+const html = (b, status = 200) => new Response(b, { status, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+
+const FORGET = `<p style="text-align:center;font:13px system-ui;opacity:.75;padding:0 16px 32px">Your token lives only in this tab. <a href="/try" onclick="try{sessionStorage.removeItem('cfcost_token')}catch{}" style="color:inherit">Forget it</a></p>`;
+
+// One render for a visitor's own token. Token arrives in a header, is used for this request only, never logged or stored.
+async function guest(req) {
+  const tok = req.headers.get('X-CF-Token') || '';
+  if (req.method !== 'POST' || !/^[\w-]{20,200}$/.test(tok)) return new Response("That doesn't look like a Cloudflare API token.", { status: 400 });
+  try {
+    const t = TEMPLATES[new URL(req.url).searchParams.get('t')] || ledger;
+    return html(t(summarize(await data({ CF_BILLING_TOKEN: tok, guest: true }))).replace(/href="\/api\/data"/g, 'href="/try"').replace('</body>', FORGET + '</body>'));
+  } catch (e) {
+    const m = /9109|10000|Authentication|Unauthorized/.test(e.message) ? "Cloudflare rejected that token. It needs Billing Read; the button above sets that up." : e.message;
+    return new Response(m, { status: 502 });
+  }
+}
+
 export default {
   async fetch(req, env) {
-    if (new URL(req.url).pathname === "/favicon.ico") return new Response(null, { status: 204 });
+    const path = new URL(req.url).pathname;
+    if (path === "/favicon.ico") return new Response(null, { status: 204 });
+    if (path === "/try") return html(tryPage());
+    if (path === "/try/render") return guest(req);
     if (!authed(req, env)) return new Response("Login required", { status: 401, headers: { "WWW-Authenticate": "Basic realm=\"cf-cost\"" } });
     const url = new URL(req.url);
     try {

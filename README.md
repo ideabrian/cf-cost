@@ -2,6 +2,8 @@
 
 **See what Cloudflare is actually charging you.** A password-protected dashboard on your own Cloudflare account: every usage meter against what's included, plans, invoices by month, domain renewal dates and prices, and a warning when anything passes 70%.
 
+**Just want to see your bill?** https://cf-cost.<subdomain>.workers.dev/try (paste a read-only token, nothing stored).
+
 Three looks, switch with `?t=`:
 
 | `ledger` | `terminal` | `receipt` |
