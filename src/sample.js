@@ -4,7 +4,7 @@ export function sample() {
   const inc = (service, family, unit, used, included, cost = 0) => ({ service, family, unit, used, cost, included, pct: used / included });
   const invoices = [];
   for (let m = 0; m < 12; m++) {
-    const d = new Date(); d.setUTCDate(25); d.setUTCMonth(d.getUTCMonth() - m);
+    const d = new Date(); d.setUTCDate(25); d.setUTCMonth(d.getUTCMonth() - m - (new Date().getUTCDate() < 25 ? 1 : 0)); // last 25th on or before today, then back m months
     invoices.push({ date: d.toISOString().slice(0, 10), amount: m === 0 ? 7.85 : m === 4 ? 25 : 5, receipt: 'IN-SAMPLE' + (100 + m), status: 'paid' });
   }
   invoices.splice(3, 0, { date: day(-100), amount: 10.44, receipt: 'IN-SAMPLE099', status: 'paid' });
