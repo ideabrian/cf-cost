@@ -10,6 +10,12 @@ Three looks, switch with `?t=`:
 |---|---|---|
 | Clean cards, light/dark | Green phosphor, ASCII meters | Paper till slip with stamp |
 
+## Install (1 click)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost)
+
+It asks for a token (link to a pre-filled read-only one included) and a password, then deploys to your account.
+
 ## Install (2 minutes, with Claude Code)
 
 Copy the prompt in [SETUP-PROMPT.md](SETUP-PROMPT.md) into Claude Code. It opens a pre-filled, read-only token page, deploys the worker, and gives you the password.

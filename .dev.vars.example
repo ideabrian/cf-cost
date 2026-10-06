@@ -1,0 +1,4 @@
+# Read-only Cloudflare API token (Billing, Analytics, Workers, D1, R2, Registrar Domains: all Read)
+CF_BILLING_TOKEN=
+# Password for your dashboard (any username)
+DASH_PASSWORD=

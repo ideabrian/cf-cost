@@ -38,7 +38,7 @@ input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;bac
 <small class="dim">Pick a look. <a href="/try/demo" target="_blank" style="color:var(--accent)">See a full sample ↗</a></small>
 <button id="go">Show my bill</button><p id="err" role="alert"></p></form></li>
 </ol>
-<p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. Prefer to host it yourself? <a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">It's open source</a>.</small></p>
+<p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. Prefer your own copy? <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost" style="color:var(--accent)">Deploy it to your account in one click</a> (<a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">open source</a>).</small></p>
 </main>
 <script>
 const K='cfcost_token',f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');
