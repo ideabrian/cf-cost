@@ -6,6 +6,8 @@ Public routes (no auth):
 - `/try` — onboarding: pre-filled token link → paste token → pick look → dashboard. Token in sessionStorage only.
 - `POST /try/render?t=` — header `X-CF-Token`; rate-limited 10/min/IP (binding TRY_LIMIT, approximate); renders dashboard with visitor's token. Not stored/logged; guest account lookup not cached.
 
+- `/try/demo?t=` — template rendered with made-up data (src/sample.js), orange 'sample' banner; `&thumb=1` = no banner (landing thumbnails).
+
 Owner routes (Basic auth, any username, password = DASH_PASSWORD):
 - `/` — HTML: plans, overage this period, 12-mo invoiced, invoices by month, every usage meter vs included, invoice list
 - `/api/data` — same data as JSON

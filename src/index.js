@@ -4,6 +4,7 @@ import ledger from "./templates/ledger.js";
 import terminal from "./templates/terminal.js";
 import receipt from "./templates/receipt.js";
 import tryPage from "./try.js";
+import { sample } from "./sample.js";
 
 const TEMPLATES = { ledger, terminal, receipt };
 const API = 'https://api.cloudflare.com/client/v4/accounts/';
@@ -135,6 +136,15 @@ const html = (b, status = 200) => new Response(b, { status, headers: { 'content-
 
 const FORGET = `<p style="text-align:center;font:13px system-ui;opacity:.75;padding:0 16px 32px">Your token lives only in this tab. <a href="/try" onclick="try{sessionStorage.removeItem('cfcost_token')}catch{}" style="color:inherit">Forget it</a></p>`;
 
+// Sample-data render for previews. thumb=1 is the landing-page thumbnail (no banner).
+const BANNER = `<div style="position:sticky;top:0;z-index:9;background:#f38020;color:#fff;text-align:center;font:600 14px system-ui;padding:8px 16px">Sample data, not a real account. <a href="/try" style="color:#fff">See yours →</a></div>`;
+function demo(url) {
+  const t = TEMPLATES[url.searchParams.get('t')] || ledger;
+  let h = t(summarize(sample())).replace(/href="\/api\/data"/g, 'href="/try"').replace(/href="\?t=/g, 'href="/try/demo?t=');
+  if (!url.searchParams.has('thumb')) h = h.replace(/<body([^>]*)>/, '<body$1>' + BANNER);
+  return html(h);
+}
+
 // One render for a visitor's own token. Token arrives in a header, is used for this request only, never logged or stored.
 async function guest(req, env) {
   if (env.TRY_LIMIT && !(await env.TRY_LIMIT.limit({ key: req.headers.get('cf-connecting-ip') || 'x' })).success) return new Response('Too many tries. Wait a minute.', { status: 429 });
@@ -155,6 +165,7 @@ export default {
     if (path === "/favicon.ico") return new Response(null, { status: 204 });
     if (path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
+    if (path === "/try/demo") return demo(new URL(req.url));
     if (!authed(req, env)) return new Response("Login required", { status: 401, headers: { "WWW-Authenticate": "Basic realm=\"cf-cost\"" } });
     const url = new URL(req.url);
     try {
