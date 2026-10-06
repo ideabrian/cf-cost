@@ -1,4 +1,5 @@
 {
+  // Only used by the Deploy-to-Cloudflare button. We deploy with `cf deploy` (cloudflare.config.ts); keep bindings in sync.
   "name": "cf-cost",
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",

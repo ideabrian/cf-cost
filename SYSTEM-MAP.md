@@ -20,8 +20,8 @@ Secrets (worker secrets; owner's source mapping is in local HANDOFF.md):
 - `CF_BILLING_TOKEN`: read-only user token (Billing/Analytics/Workers/D1/R2/Registrar read)
 - `DASH_PASSWORD`: owner dashboard password
 
-Commands: `npx wrangler deploy`
-URL: https://cfcost.com (custom domain attached in CF dash/API, deliberately NOT in wrangler.jsonc so forks/Deploy-button users don't try to claim it; survives deploys; www.cfcost.com also attached via `wrangler deploy --domain`, 301 → apex)
+Commands: `npm run deploy` (= `cf deploy`, Cloudflare CLI, reads `cloudflare.config.ts`) · `npm run dev` (= `cf dev`). Wrangler is only a devDependency (cf delegates builds to it). `wrangler.jsonc` kept ONLY for the Deploy-to-Cloudflare button; mirror binding changes there.
+URL: https://cfcost.com (custom domain attached in CF dash/API, deliberately NOT in wrangler.jsonc so forks/Deploy-button users don't try to claim it; survives deploys; www.cfcost.com also attached (once, via wrangler --domain), 301 → apex)
 
 Brand: src/brand.js (logo, /favicon.svg, title prefix "CF Cost", footer "not affiliated with Cloudflare" on every dashboard render).
 Account: auto-detected from token unless CF_ACCOUNT_ID set. Onboarding page: src/try.js. Templates: src/templates/{ledger,terminal,receipt}.js, pick via ?t= or TEMPLATE var.

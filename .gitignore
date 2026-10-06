@@ -1,4 +1,7 @@
 node_modules
+.dev.vars
+.cloudflare/
+.wrangler/
 
 # private session notes (personal data); stays local
 HANDOFF.md
