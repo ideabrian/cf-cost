@@ -68,6 +68,34 @@ async function domains(env) {
   }).sort((a, b) => a.days - b.days);
 }
 
+// R2 operations per bucket for the billing period, via GraphQL analytics (needs Account Analytics Read).
+// Class A/B per developers.cloudflare.com/r2/pricing; deletes and aborts are free. null = no access.
+const R2_B = /^(Get|Head)|UsageSummary/;
+const R2_FREE = /^(Delete|AbortMultipartUpload)/;
+async function r2(env, since) {
+  const q = `query($a:String!,$s:Date!,$e:Date!){viewer{accounts(filter:{accountTag:$a}){r2OperationsAdaptiveGroups(limit:1000,filter:{date_geq:$s,date_leq:$e}){sum{requests} dimensions{bucketName actionType}}}}}`;
+  try {
+    const r = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + env.CF_BILLING_TOKEN, "content-type": "application/json" },
+      body: JSON.stringify({ query: q, variables: { a: await accountId(env), s: since, e: new Date().toISOString().slice(0, 10) } }),
+    });
+    const j = await r.json();
+    const rows = j.data?.viewer?.accounts?.[0]?.r2OperationsAdaptiveGroups;
+    if (!rows) return null;
+    const by = {};
+    for (const { sum, dimensions: { bucketName: name, actionType: act } } of rows) {
+      const b = by[name || '(account)'] || (by[name || '(account)'] = { bucket: name || '(account)', a: 0, b: 0, free: 0, acts: {} });
+      b[R2_FREE.test(act) ? 'free' : R2_B.test(act) ? 'b' : 'a'] += sum.requests;
+      if (!R2_FREE.test(act)) b.acts[act] = (b.acts[act] || 0) + sum.requests;
+    }
+    return Object.values(by).map(b => {
+      const [topAct, topN] = Object.entries(b.acts).sort((x, y) => y[1] - x[1])[0] || ['deletes only', b.free];
+      return { bucket: b.bucket, classA: b.a, classB: b.b, free: b.free, cost: b.a / 1e6 * 4.5 + b.b / 1e6 * 0.36, top: topAct, topN };
+    }).sort((x, y) => y.cost - x.cost || y.classA - x.classA);
+  } catch { return null; }
+}
+
 async function data(env) {
   const [usage, hist, subs, doms] = await Promise.all([
     cf(env, '/billable-usage'),
@@ -86,9 +114,11 @@ async function data(env) {
     const inc = included(b.service, b.unit);
     return { ...b, included: inc, pct: inc ? b.used / inc : null };
   }).sort((a, b) => (b.cost - a.cost) || ((b.pct || 0) - (a.pct || 0)));
+  const periodStart = usage[0]?.BillingPeriodStart?.slice(0, 10) || new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+  const buckets = await r2(env, periodStart);
   const invoices = hist.filter(h => h.type === 'invoice').map(h => ({ date: h.occurred_at.slice(0, 10), amount: h.amount ?? null, receipt: h.receipt_id, status: h.status }));
   const plans = subs.filter(s => s.price > 0 || s.rate_plan?.scope !== 'zone').map(s => ({ name: s.rate_plan?.public_name, price: s.price, freq: s.frequency }));
-  return { periodStart: usage[0]?.BillingPeriodStart?.slice(0, 10), meters, invoices, plans, domains: doms, at: new Date().toISOString() };
+  return { periodStart, meters, buckets, invoices, plans, domains: doms, at: new Date().toISOString() };
 }
 
 function authed(req, env) {

@@ -1,4 +1,4 @@
-import { esc, money, num, short, DOMAINS_HINT } from '../lib.js';
+import { esc, money, num, short, DOMAINS_HINT, R2_HINT, R2_NOTE, cents } from '../lib.js';
 
 // Terminal: phosphor-green monospace, ASCII meters. Always dark.
 const bar = (p, w = 20) => { const f = Math.round(Math.min(1, p) * w); return '█'.repeat(f) + '░'.repeat(w - f); };
@@ -39,6 +39,10 @@ a{color:var(--g)}.cur::after{content:"█";animation:b 1s steps(1) infinite}@key
 <div class="sec scroll"><div class="h">── plans ${'─'.repeat(40)}</div>
 ${s.plans.map(p => `<div class="ln">${esc(pad(p.name, 36))} ${money(p.price || 0).padStart(8)}  ${esc(p.freq)}</div>`).join('')}</div>
 <div class="sec scroll"><div class="h">── meters ${'─'.repeat(39)}</div>${meters}</div>
+${!s.buckets ? `<div class="sec d">── r2: ${esc(R2_HINT)}</div>` : s.buckets.length ? `<div class="sec scroll"><div class="h">── r2 by bucket · ${num(s.r2A)} A · ${num(s.r2B)} B ${'─'.repeat(20)}</div>
+<div class="ln d">${pad('bucket', 26)} ${'class A'.padStart(9)} ${'class B'.padStart(9)}  ${pad('top action', 22)} ${'list $'.padStart(8)}</div>
+${s.buckets.map(b => `<div class="ln ${b.classA >= 1e6 ? 'r' : b.classA >= 1e5 ? 'y' : ''}">${esc(pad(b.bucket, 26))} ${num(b.classA).padStart(9)} ${num(b.classB).padStart(9)}  ${esc(pad(b.top, 22))} ${cents(b.cost).padStart(8)}</div>`).join('')}
+<div class="d">${esc(R2_NOTE)}</div></div>` : ''}
 ${!s.domains ? `<div class="sec d">── domains: ${esc(DOMAINS_HINT)}</div>` : `<div class="sec scroll"><div class="h">── domains · ${money(s.renew12)} next 12mo · ${money(s.renewYear)}/yr ${'─'.repeat(12)}</div>
 ${s.domains.map(x => `<div class="ln ${x.days <= 60 ? 'y' : ''}">${esc(pad(x.name, 26))} ${esc(x.expires)}  ${String(x.days).padStart(4)}d  ${x.autoRenew ? 'auto  ' : '<span class="r">MANUAL</span>'}  ${x.renewal == null ? '       —' : money(x.renewal).padStart(8)}</div>`).join('')}</div>`}
 <div class="sec scroll"><div class="h">── invoices ${'─'.repeat(37)}</div>

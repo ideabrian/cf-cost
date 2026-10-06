@@ -11,7 +11,8 @@ Owner routes (Basic auth, any username, password = DASH_PASSWORD):
 - `/api/data` — same data as JSON
 - `/favicon.ico` — 204, no auth
 
-CF API used: `/accounts/:id/billable-usage`, `/billing/history`, `/subscriptions`.
+CF API used: `/accounts/:id/billable-usage`, `/billing/history`, `/subscriptions`, GraphQL `r2OperationsAdaptiveGroups` (R2 ops per bucket+action, billing period → today; needs Account Analytics Read; panel shows hint if missing).
+R2 panel: Class A/B per bucket at list price ($4.50/M A, $0.36/M B; deletes free; free tier account-wide so per-bucket $ is list, not billed). Top action = top billable action. Totals run ~1 day ahead of billing meter.
 
 Secrets (Forge Vault, category `cloudflare`):
 - `CF_BILLING_TOKEN` ← vault `<vault-key>` (user token cf-cost-control: Billing/Analytics/Workers/D1/R2 read)
@@ -23,4 +24,4 @@ URL: https://cf-cost.<subdomain>.workers.dev
 Account: auto-detected from token unless CF_ACCOUNT_ID set. Onboarding page: src/try.js. Templates: src/templates/{ledger,terminal,receipt}.js, pick via ?t= or TEMPLATE var.
 Notes: invoice API returns no amount for invoices before 2025-06 (shown as —). No line items via API; large one-offs ≈ domain registrations.
 Domains: /registrar/domains (needs Registrar Domains Read; panel shows hint if missing). Renewal price per TLD via POST /registrar/domain-check on a made-up name.
-Not here yet: rate limit on /try/render, Deploy-to-CF button, weekly alert cron, per-worker cost attribution.
+Not here yet: R2 storage GB per bucket, rate limit on /try/render, Deploy-to-CF button, weekly alert cron, per-worker cost attribution.
