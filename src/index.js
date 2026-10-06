@@ -7,6 +7,7 @@ import receipt from "./templates/receipt.js";
 import exploded, { diagram } from "./templates/exploded.js";
 import { chatPublic, chatAdmin } from "./chat.js";
 import { printer } from "./printer.js";
+import { DIY_PROMPT } from "./diy.js";
 import tryPage from "./try.js";
 import { sample } from "./sample.js";
 import { brand, FAVICON_SVG } from "./brand.js";
@@ -190,7 +191,7 @@ async function brian(req, env, ctx) {
 
 // Landing: tap-the-cloud intro built from Brian's real (redacted) bill. Whole page cached 1h; falls back to plain page.
 async function landing(env, ctx) {
-  const key = new Request('https://cfcost.com/?landing&v=16');
+  const key = new Request('https://cfcost.com/?landing&v=17');
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
   try { const b = summarize({ ...redact(await data(env)), serverToken: true }); h = tryPage({ ...diagram(b, { cta: 'TAP TO FIND OUT' }), printer: printer(b, { who: '@brianball' }) }); }
@@ -210,6 +211,7 @@ export default {
     const pub = await chatPublic(req, env, path); if (pub) return pub;
     if (path === "/") return landing(env, ctx);
     if (path === "/try") return html(tryPage());
+    if (path === "/diy.txt") return new Response(DIY_PROMPT + "\n", { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "public, max-age=3600" } });
     if (path === "/try/render") return guest(req, env);
     if (path === "/try/demo") return demo(new URL(req.url));
     if (path === "/brian") return brian(req, env, ctx);

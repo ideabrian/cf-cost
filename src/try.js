@@ -1,10 +1,13 @@
 import { LOGO, ICON_LINK, CREDIT } from './brand.js';
 import { DIAGRAM_CSS } from './templates/exploded.js';
 import { PRINTER_CSS } from './printer.js';
+import { DIY_PROMPT } from './diy.js';
+import { esc } from './lib.js';
 
 // Public /try page: visitor pastes a read-only token, it stays in this tab (sessionStorage), the worker uses it
 // for one render and forgets it. Nothing stored server-side.
-export const TOKEN_URL = 'https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22billing%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22registrar_domains%22%2C%22type%22%3A%22read%22%7D%5D&name=cf-cost&accountId=*&zoneId=all';
+export { TOKEN_URL } from './lib.js';
+import { TOKEN_URL } from './lib.js';
 
 // intro = { svg, total, count } from diagram(): landing-page stage (tap the cloud → Brian's real bill explodes → "See what you pay").
 export default function tryPage(intro) {
@@ -27,6 +30,18 @@ a.btn,button{display:inline-block;background:var(--accent);color:#fff;border:0;b
 button:disabled{opacity:.6;cursor:wait}
 input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:14px ui-monospace,Menlo,monospace}
 .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-decoration:none;font:700 18px system-ui;letter-spacing:-.01em}
+.diy{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:10px}
+.diy-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.diy-top b{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)}
+.pbox{position:relative;max-height:96px;overflow:hidden;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.pbox::after{content:"";position:absolute;inset:auto 0 0 0;height:48px;background:linear-gradient(transparent,var(--bg))}
+.diy pre,#diyModal pre{margin:0;padding:10px 12px;font:12.5px/1.5 ui-monospace,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--fg)}
+.diy-row{display:flex;gap:10px;flex-wrap:wrap}
+button.alt{background:transparent;color:var(--accent);border:2px solid var(--accent);padding:8px 14px}
+#diyModal{width:100vw;height:100vh;max-width:none;max-height:none;margin:0;border:0;padding:0;background:var(--bg);color:var(--fg)}
+#diyModal::backdrop{background:#0008}
+.dm-in{max-width:760px;margin:0 auto;padding:24px 16px;display:grid;gap:14px;height:100%;grid-template-rows:auto 1fr auto}
+#diyModal pre{overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--card);font-size:14px}
 #err{color:var(--bad)}small{font-size:13px}
 ${intro ? `${DIAGRAM_CSS}
 ${PRINTER_CSS}
@@ -67,14 +82,23 @@ ${intro ? '' : `<a href="/" class="brand">${LOGO}<span>CF Cost</span></a>`}
 <input type="hidden" name="t" value="exploded">
 <button id="go">Show my bill</button><p id="err" role="alert"></p></form></li>
 </ol>
-<section style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:10px">
-<b style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)">Or run your own copy</b>
-<p>Deploy CF Cost to your Cloudflare account. Your token never leaves your account, and the dashboard is behind your own password at <code>/me</code>.</p>
-<a class="btn alt" href="https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost" target="_blank" rel="noopener">Deploy to Cloudflare ↗</a></section>
+<section class="diy" aria-labelledby="diyH">
+<div class="diy-top"><b id="diyH">DIY · run it yourself</b><small class="dim">Nothing goes through us.</small></div>
+<p>Rather not paste a token here? Give this prompt to your own AI agent (Claude Code, Codex, Cursor). It puts CF Cost on your Cloudflare account, behind your own password.</p>
+<div class="pbox"><pre id="diyPre">${esc(DIY_PROMPT)}</pre></div>
+<div class="diy-row"><button type="button" id="diyCopy">Copy prompt</button><button type="button" class="alt" id="diyOpen" aria-haspopup="dialog">Show full prompt ⤢</button></div>
+</section>
+<dialog id="diyModal" aria-labelledby="diyMH"><div class="dm-in"><div class="diy-top"><b id="diyMH">DIY prompt</b><button type="button" class="alt" id="diyClose">Close ✕</button></div>
+<pre>${esc(DIY_PROMPT)}</pre><div class="diy-row"><button type="button" id="diyCopy2">Copy prompt</button><a href="/diy.txt" class="dim" style="align-self:center">Plain text</a></div></div></dialog>
 <p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. <a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">Open source</a>.<br>CF Cost is an independent tool, not affiliated with Cloudflare.</small></p>
 <p class="dim" style="text-align:center"><small>${CREDIT}</small></p>
 </main>
 <script>
+(()=>{const P=${JSON.stringify(DIY_PROMPT).replace(/</g,'\\u003c')},m=document.getElementById('diyModal');
+const copy=async b=>{try{await navigator.clipboard.writeText(P);b.textContent='Copied ✓'}catch{b.textContent='Select and copy below';const r=document.createRange();r.selectNodeContents(m.open?m.querySelector('pre'):document.getElementById('diyPre'));const s=getSelection();s.removeAllRanges();s.addRange(r)}setTimeout(()=>b.textContent='Copy prompt',2000)};
+document.getElementById('diyCopy').onclick=e=>copy(e.currentTarget);document.getElementById('diyCopy2').onclick=e=>copy(e.currentTarget);
+document.getElementById('diyOpen').onclick=()=>m.showModal();document.getElementById('diyClose').onclick=()=>m.close();
+m.addEventListener('click',e=>{if(e.target===m)m.close()});})();
 ${intro ? `(()=>{const f=document.getElementById('sfig'),v=f.querySelector('svg'),H=+v.dataset.h,cy=+v.dataset.cy,a=document.getElementById('after'),m=document.querySelector('main.w');
 a.hidden=true;m.hidden=true;let done=false;
 function boom(){if(done)return;done=true;v.removeAttribute('tabindex');v.setAttribute('aria-label',v.getAttribute('aria-label').replace('Tap the cloud to see','Exploded diagram of'));

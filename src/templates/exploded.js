@@ -1,5 +1,5 @@
 import { esc, money, num, short } from '../lib.js';
-import { TOKEN_URL } from '../try.js';
+import { TOKEN_URL } from '../lib.js';
 import { printer, PRINTER_CSS } from '../printer.js';
 
 // Exploded: your bill as an exploded-view diagram. Every charge bursts out of the orange cloud, labeled.

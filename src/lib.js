@@ -32,3 +32,6 @@ export const DOMAINS_HINT = 'Add "Account → Registrar: Domains → Read" to yo
 // Shown in place of the R2 panel when the token can't read analytics.
 export const R2_HINT = 'Add "Account → Account Analytics → Read" to your cf-cost token to see R2 operations per bucket.';
 export const R2_NOTE = 'List price per bucket: Class A $4.50/M (writes, lists), Class B $0.36/M (reads). Free tier (1M A + 10M B/mo) applies account-wide, so your bill is lower. Deletes are free.';
+
+// Pre-filled read-only token page (Billing, Analytics, Workers, D1, R2, Registrar).
+export const TOKEN_URL = 'https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22billing%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22registrar_domains%22%2C%22type%22%3A%22read%22%7D%5D&name=cf-cost&accountId=*&zoneId=all';
