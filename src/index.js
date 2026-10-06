@@ -19,8 +19,12 @@ async function accountId(env) {
   return acct;
 }
 
-async function cf(env, path) {
-  const r = await fetch(API + await accountId(env) + path, { headers: { Authorization: 'Bearer ' + env.CF_BILLING_TOKEN } });
+async function cf(env, path, body) {
+  const r = await fetch(API + await accountId(env) + path, {
+    method: body ? "POST" : "GET",
+    headers: { Authorization: "Bearer " + env.CF_BILLING_TOKEN, ...(body && { "content-type": "application/json" }) },
+    body: body && JSON.stringify(body),
+  });
   const j = await r.json();
   if (!j.success && !Array.isArray(j.result)) throw new Error(path + ': ' + JSON.stringify(j.errors || r.status));
   return j.result || [];
@@ -37,11 +41,29 @@ function included(name, unit) {
   return n;
 }
 
+// Registrar domains + renewal price per TLD. The domain list carries no price, so we price-check a made-up
+// name on each TLD (domain-check returns renewal_cost). null = token lacks Registrar Domains Read.
+async function domains(env) {
+  let list;
+  try { list = await cf(env, "/registrar/domains?per_page=100"); } catch { return null; }
+  const tlds = [...new Set(list.map(d => d.name.split(".").slice(1).join(".")))];
+  const price = {};
+  for (let i = 0; i < tlds.length; i += 20) {
+    const res = await cf(env, "/registrar/domain-check", { domains: tlds.slice(i, i + 20).map(t => "zq7priceprobe9." + t) }).catch(() => ({}));
+    for (const r of res.domains || []) if (r.pricing) price[r.name.split(".").slice(1).join(".")] = Number(r.pricing.renewal_cost);
+  }
+  return list.map(d => {
+    const tld = d.name.split(".").slice(1).join(".");
+    return { name: d.name, expires: d.expires_at?.slice(0, 10), autoRenew: !!d.auto_renew, renewal: price[tld] ?? null, days: Math.round((Date.parse(d.expires_at) - Date.now()) / 864e5) };
+  }).sort((a, b) => a.days - b.days);
+}
+
 async function data(env) {
-  const [usage, hist, subs] = await Promise.all([
+  const [usage, hist, subs, doms] = await Promise.all([
     cf(env, '/billable-usage'),
     cf(env, '/billing/history?per_page=100'),
     cf(env, '/subscriptions').catch(() => []),
+    domains(env),
   ]);
   const by = {};
   for (const u of usage) {
@@ -56,7 +78,7 @@ async function data(env) {
   }).sort((a, b) => (b.cost - a.cost) || ((b.pct || 0) - (a.pct || 0)));
   const invoices = hist.filter(h => h.type === 'invoice').map(h => ({ date: h.occurred_at.slice(0, 10), amount: h.amount ?? null, receipt: h.receipt_id, status: h.status }));
   const plans = subs.filter(s => s.price > 0 || s.rate_plan?.scope !== 'zone').map(s => ({ name: s.rate_plan?.public_name, price: s.price, freq: s.frequency }));
-  return { periodStart: usage[0]?.BillingPeriodStart?.slice(0, 10), meters, invoices, plans, at: new Date().toISOString() };
+  return { periodStart: usage[0]?.BillingPeriodStart?.slice(0, 10), meters, invoices, plans, domains: doms, at: new Date().toISOString() };
 }
 
 function authed(req, env) {

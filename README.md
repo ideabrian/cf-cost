@@ -1,6 +1,6 @@
 # cf-cost
 
-**See what Cloudflare is actually charging you.** A password-protected dashboard on your own Cloudflare account: every usage meter against what's included, plans, invoices by month, and a warning when anything passes 70%.
+**See what Cloudflare is actually charging you.** A password-protected dashboard on your own Cloudflare account: every usage meter against what's included, plans, invoices by month, domain renewal dates and prices, and a warning when anything passes 70%.
 
 Three looks, switch with `?t=`:
 
@@ -19,7 +19,8 @@ Copy the prompt in [SETUP-PROMPT.md](SETUP-PROMPT.md) into Claude Code. It opens
 2. `npx degit ideabrian/cf-cost cf-cost && cd cf-cost`
 3. `npx wrangler deploy`
 4. `npx wrangler secret put CF_BILLING_TOKEN` (paste token) and `npx wrangler secret put DASH_PASSWORD`
-5. Open `https://cf-cost.<you>.workers.dev`. Any username, your password.
+5. Optional, for the domains panel: edit the token and add **Account → Registrar: Domains → Read**.
+6. Open `https://cf-cost.<you>.workers.dev`. Any username, your password.
 
 Options (`wrangler.jsonc` vars): `TEMPLATE` = `ledger` | `terminal` | `receipt`. `CF_ACCOUNT_ID` if your token sees more than one account.
 

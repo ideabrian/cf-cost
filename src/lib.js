@@ -16,5 +16,12 @@ export function summarize(d) {
   const mMax = Math.max(1, ...months.map(m => m.amount));
   const hot = d.meters.filter(m => m.cost > 0 || (m.pct || 0) >= 0.7);
   const flag = m => m.cost > 0 ? 'bad' : (m.pct || 0) >= 0.7 ? 'warn' : '';
-  return { ...d, overage, base, yearTotal, months, mMax, hot, flag };
+  const doms = d.domains || [];
+  const renew12 = doms.filter(x => x.autoRenew && x.days <= 365).reduce((s, x) => s + (x.renewal || 0), 0);
+  const renewYear = doms.filter(x => x.autoRenew).reduce((s, x) => s + (x.renewal || 0), 0);
+  const soon = doms.filter(x => x.days <= 60);
+  return { ...d, renew12, renewYear, soon, overage, base, yearTotal, months, mMax, hot, flag };
 }
+
+// Shown in place of the domains panel when the token can't read the registrar.
+export const DOMAINS_HINT = 'Add "Account → Registrar: Domains → Read" to your cf-cost token to see renewals here.';

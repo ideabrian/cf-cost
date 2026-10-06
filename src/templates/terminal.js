@@ -1,4 +1,4 @@
-import { esc, money, num, short } from '../lib.js';
+import { esc, money, num, short, DOMAINS_HINT } from '../lib.js';
 
 // Terminal: phosphor-green monospace, ASCII meters. Always dark.
 const bar = (p, w = 20) => { const f = Math.round(Math.min(1, p) * w); return '█'.repeat(f) + '░'.repeat(w - f); };
@@ -39,6 +39,8 @@ a{color:var(--g)}.cur::after{content:"█";animation:b 1s steps(1) infinite}@key
 <div class="sec scroll"><div class="h">── plans ${'─'.repeat(40)}</div>
 ${s.plans.map(p => `<div class="ln">${esc(pad(p.name, 36))} ${money(p.price || 0).padStart(8)}  ${esc(p.freq)}</div>`).join('')}</div>
 <div class="sec scroll"><div class="h">── meters ${'─'.repeat(39)}</div>${meters}</div>
+${!s.domains ? `<div class="sec d">── domains: ${esc(DOMAINS_HINT)}</div>` : `<div class="sec scroll"><div class="h">── domains · ${money(s.renew12)} next 12mo · ${money(s.renewYear)}/yr ${'─'.repeat(12)}</div>
+${s.domains.map(x => `<div class="ln ${x.days <= 60 ? 'y' : ''}">${esc(pad(x.name, 26))} ${esc(x.expires)}  ${String(x.days).padStart(4)}d  ${x.autoRenew ? 'auto  ' : '<span class="r">MANUAL</span>'}  ${x.renewal == null ? '       —' : money(x.renewal).padStart(8)}</div>`).join('')}</div>`}
 <div class="sec scroll"><div class="h">── invoices ${'─'.repeat(37)}</div>
 ${s.invoices.map(i => `<div class="ln ${i.amount >= 25 ? 'y' : ''}">${esc(i.date)}  ${esc(pad(i.receipt, 12))}  ${i.amount == null ? '       —' : money(i.amount).padStart(8)}</div>`).join('')}</div>
 <p class="sec">$ <span class="cur"></span></p>

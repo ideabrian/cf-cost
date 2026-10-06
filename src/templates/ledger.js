@@ -1,4 +1,4 @@
-import { esc, money, num } from '../lib.js';
+import { esc, money, num, DOMAINS_HINT } from '../lib.js';
 
 // Ledger: clean light/dark cards, the original look.
 export default function ledger(s) {
@@ -31,6 +31,7 @@ tr.warn .bar i{background:var(--warn)}tr.bad .bar i{background:var(--bad)}tr.bad
   <div class="tile"><b class="${overage > 0 ? '' : 'ok'}">${money(overage)}</b><span>Usage overage this period</span></div>
   <div class="tile"><b>${money(yearTotal)}</b><span>Invoiced last 12 months</span></div>
   <div class="tile"><b>${hot.length}</b><span>Meters ≥70% or charging</span></div>
+  ${s.domains ? `<div class="tile"><b>${money(s.renew12)}</b><span>Domain renewals, next 12 mo</span></div>` : ""}
 </section>
 ${hot.length ? `<div class="alert">Watch: ${hot.map(m => esc(m.service.replace(/\s*\(.*\)/, ''))).join(' · ')}</div>` : `<p class="ok">Every meter is inside what's included. Nothing is costing extra.</p>`}
 <section class="card"><h2>Invoices by month</h2><div class="months">${months.map(({ month: k, amount: v }) => `<div title="${esc(k)}: ${money(v)}"><small class="mono">${Math.round(v)}</small><i style="height:${Math.max(2, v / mMax * 90)}%"></i><small>${esc(k.slice(2))}</small></div>`).join('')}</div></section>
@@ -38,6 +39,7 @@ ${hot.length ? `<div class="alert">Watch: ${hot.map(m => esc(m.service.replace(/
 <section class="card"><h2>Usage this period</h2><table><tr><th>Meter</th><th class="r">Used</th><th class="r">Included</th><th>Of included</th><th class="r">Cost</th></tr>
 ${d.meters.map(m => `<tr class="${flag(m)}"><td>${esc(m.service.replace(/\s*\(.*\)/, ''))}<br><small class="dim">${esc(m.family)}</small></td><td class="r mono">${num(m.used)} <small class="dim">${esc(m.unit)}</small></td><td class="r mono">${m.included != null ? num(m.included) : '—'}</td><td>${m.pct != null ? `<div class="bar"><i style="width:${Math.min(100, m.pct * 100).toFixed(1)}%"></i></div><small class="dim mono">${(m.pct * 100).toFixed(1)}%</small>` : ''}</td><td class="r mono">${money(m.cost)}</td></tr>`).join('')}
 </table></section>
+${!s.domains ? `<section class="card"><h2>Domains</h2><p class="dim" style="margin:0">${esc(DOMAINS_HINT)}</p></section>` : `<section class="card"><h2>Domains · ${money(s.renew12)} renewing in the next 12 months</h2><p class="dim" style="margin:0 0 8px">${s.domains.length} domains · ${money(s.renewYear)}/yr if all auto-renew ${s.soon.length ? `· <b style="color:var(--warn)">${s.soon.length} renew within 60 days</b>` : ""}</p><table><tr><th>Domain</th><th>Renews</th><th class="r">In</th><th>Auto</th><th class="r">Price/yr</th></tr>${s.domains.map(x => `<tr${x.days <= 60 ? ' class="warn"' : ""}><td>${esc(x.name)}</td><td class="mono">${esc(x.expires)}</td><td class="r mono">${x.days}d</td><td>${x.autoRenew ? "on" : '<span style="color:var(--bad)">off</span>'}</td><td class="r mono">${x.renewal == null ? "—" : money(x.renewal)}</td></tr>`).join("")}</table></section>`}
 <section class="card"><h2>Invoices</h2><p class="dim" style="margin:0 0 8px">Large one-offs are usually domain registrations/renewals. Line items: dashboard → Billing → Invoices.</p><table><tr><th>Date</th><th>Receipt</th><th class="r">Amount</th></tr>
 ${d.invoices.map(i => `<tr${i.amount >= 25 ? ' class="warn"' : ''}><td class="mono">${esc(i.date)}</td><td class="mono dim">${esc(i.receipt)}</td><td class="r mono">${i.amount == null ? "<span class=dim>—</span>" : money(i.amount)}</td></tr>`).join('')}
 </table></section>

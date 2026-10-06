@@ -1,4 +1,4 @@
-import { esc, money, num, short } from '../lib.js';
+import { esc, money, num, short, DOMAINS_HINT } from '../lib.js';
 
 // Receipt: a till receipt on a desk. Your Cloudflare bill as one long printout.
 export default function receipt(s) {
@@ -35,6 +35,7 @@ ${row('USAGE OVERAGE', money(s.overage))}
 <div class="row tot"><span>DUE / MO</span><i></i><span>${money(s.base + s.overage)}</span></div>
 <div class="c" style="margin:16px 0">${s.hot.length ? `<span class="stamp">WATCH ${s.hot.length}</span>` : '<span class="stamp">ALL CLEAR</span>'}</div>
 <div class="hr"></div>
+${!s.domains ? `<div class="c dim">${esc(DOMAINS_HINT)}</div><div class="hr"></div>` : `<div class="c dim">DOMAINS · RENEWAL SCHEDULE</div>${s.domains.map(x => row(esc(x.name) + " " + esc(x.expires.slice(2)), x.renewal == null ? "—" : money(x.renewal), x.days <= 60 || !x.autoRenew ? "warn" : "")).join("")}<div class="row tot" style="font-size:16px"><span>NEXT 12 MO</span><i></i><span>${money(s.renew12)}</span></div><div class="hr"></div>`}
 <div class="c dim">PAST 12 MONTHS: ${money(s.yearTotal)}</div>
 ${s.invoices.slice(0, 18).map(i => row(esc(i.date) + ' ' + esc(i.receipt), i.amount == null ? '—' : money(i.amount), i.amount >= 25 ? 'warn' : '')).join('')}
 <div class="hr"></div>
