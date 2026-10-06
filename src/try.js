@@ -73,5 +73,5 @@ async function show(tok,t){
 f.onsubmit=e=>{e.preventDefault();show(document.getElementById('tok').value.trim(),f.t.value)};
 let saved=null;try{saved=sessionStorage.getItem(K)}catch{}
 if(saved)show(saved,f.t.value);
-</script></body></html>`;
+</script><script src="/chat.js" defer></script></body></html>`;
 }

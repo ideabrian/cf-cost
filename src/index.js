@@ -5,6 +5,7 @@ import ledger from "./templates/ledger.js";
 import terminal from "./templates/terminal.js";
 import receipt from "./templates/receipt.js";
 import exploded from "./templates/exploded.js";
+import { chatPublic, chatAdmin } from "./chat.js";
 import tryPage from "./try.js";
 import { sample } from "./sample.js";
 import { brand, FAVICON_SVG } from "./brand.js";
@@ -169,10 +170,12 @@ export default {
     const path = u0.pathname;
     if (path === "/favicon.ico" || path === "/favicon.svg") return new Response(FAVICON_SVG, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
     if (path === "/card.png") return new Response(Uint8Array.from(atob(CARD_PNG_B64), c => c.charCodeAt(0)), { headers: { "content-type": "image/png", "cache-control": "public, max-age=86400" } });
+    const pub = await chatPublic(req, env, path); if (pub) return pub;
     if (path === "/" || path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
     if (path === "/try/demo") return demo(new URL(req.url));
     if (!authed(req, env)) return new Response("Login required", { status: 401, headers: { "WWW-Authenticate": "Basic realm=\"cf-cost\"" } });
+    const adm = await chatAdmin(req, env, path); if (adm) return adm;
     const url = new URL(req.url);
     try {
       const d = await data(env);

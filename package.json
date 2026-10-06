@@ -25,6 +25,7 @@
   },
   "scripts": {
     "dev": "cf dev",
-    "deploy": "cf deploy"
+    "deploy": "cf deploy",
+    "inbox": "node scripts/inbox.mjs"
   }
 }

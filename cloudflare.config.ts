@@ -11,6 +11,8 @@ export default defineConfig({
 			TEMPLATE: bindings.text("ledger"),
 			// /try/render: 10 renders per minute per IP
 			TRY_LIMIT: bindings.rateLimit({ namespace: "1001", simple: { limit: 10, period: 60 } }),
+			// Feedback chat (src/chat.js). Bound by name so no IDs live in this public repo.
+			CHAT: bindings.d1({ name: "cf-cost-chat" }),
 			CF_BILLING_TOKEN: bindings.secret(),
 			DASH_PASSWORD: bindings.secret(),
 		},
