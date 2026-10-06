@@ -9,8 +9,8 @@ export const TOKEN_URL = 'https://dash.cloudflare.com/profile/api-tokens?permiss
 // intro = { svg, total, count } from diagram(): landing-page stage (tap the cloud → Brian's real bill explodes → "See what you pay").
 export default function tryPage(intro) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CF Cost · what Cloudflare charges you</title>${ICON_LINK}<meta name="description" content="See what Cloudflare actually charges you, in 10 seconds. Read-only token, nothing stored.">
-<meta name="twitter:card" content="summary_large_image"><meta property="og:type" content="website"><meta property="og:url" content="https://cfcost.com/"><meta property="og:title" content="CF Cost · what Cloudflare charges you"><meta property="og:description" content="See what Cloudflare actually charges you, in 10 seconds. Read-only token, nothing stored."><meta property="og:image" content="https://cfcost.com/card.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<title>CF Cost · what does Cloudflare cost me?</title>${ICON_LINK}<meta name="description" content="See what Cloudflare actually costs you, in 10 seconds. Read-only token, nothing stored.">
+<meta name="twitter:card" content="summary_large_image"><meta property="og:type" content="website"><meta property="og:url" content="https://cfcost.com/"><meta property="og:title" content="CF Cost · what does Cloudflare cost me?"><meta property="og:description" content="See what Cloudflare actually costs you, in 10 seconds. Read-only token, nothing stored."><meta property="og:image" content="https://cfcost.com/card.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 ${intro ? '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Mono:wght@400;500&display=swap">' : ''}
 <style>
 :root{--bg:#f4f3ef;--card:#fff;--fg:#1b1b18;--dim:#6b6a63;--line:#dedcd4;--accent:#f38020;--bad:#c2341b;color-scheme:light}
@@ -57,7 +57,7 @@ ${intro.printer ? intro.printer.html : ''}
 <p><small><a href="/brian">Explore Brian's bill</a> · <a href="/try/demo">Sample account</a></small></p>
 </div></section>` : ''}<main class="w">
 ${intro ? '' : `<a href="/" class="brand">${LOGO}<span>CF Cost</span></a>`}
-<h1>${intro ? 'Now see what you pay' : 'What does Cloudflare actually charge you?'}</h1>
+<h1>${intro ? 'Now see what you pay' : 'What does Cloudflare cost me?'}</h1>
 <p class="dim">Plans, usage vs. what's included, invoices, domain renewals, all on one page. Takes about 10 seconds.</p>
 <ol>
 <li><b>1 · Make a read-only token</b><p>This link opens Cloudflare with the read permissions already ticked. Scroll down, click <em>Continue to summary</em>, then <em>Create Token</em>.</p>

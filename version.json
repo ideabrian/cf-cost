@@ -1,7 +1,12 @@
 {
-  "build": 11,
-  "lastUpdated": "2026-10-06T19:14:10Z",
+  "build": 12,
+  "lastUpdated": "2026-10-06T19:23:22Z",
   "changelog": [
+    {
+      "build": 12,
+      "date": "2026-10-06",
+      "changes": "\"cost me?\" wording on /try + title/meta; landing no browser cache so changes show at once"
+    },
     {
       "build": 11,
       "date": "2026-10-06",

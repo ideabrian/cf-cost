@@ -190,12 +190,12 @@ async function brian(req, env, ctx) {
 
 // Landing: tap-the-cloud intro built from Brian's real (redacted) bill. Whole page cached 1h; falls back to plain page.
 async function landing(env, ctx) {
-  const key = new Request('https://cfcost.com/?landing&v=9');
+  const key = new Request('https://cfcost.com/?landing&v=10');
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
   try { const b = summarize({ ...redact(await data(env)), serverToken: true }); h = tryPage({ ...diagram(b, { cta: 'TAP TO FIND OUT' }), printer: printer(b, { who: '@brianball' }) }); }
   catch { return html(tryPage()); }
-  const res = new Response(h, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=600' } });
+  const res = new Response(h, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-cache' } });
   ctx.waitUntil(caches.default.put(key, res.clone()));
   return res;
 }
