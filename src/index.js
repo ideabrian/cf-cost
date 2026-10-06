@@ -4,7 +4,7 @@ import { summarize } from "./lib.js";
 import ledger from "./templates/ledger.js";
 import terminal from "./templates/terminal.js";
 import receipt from "./templates/receipt.js";
-import exploded from "./templates/exploded.js";
+import exploded, { diagram } from "./templates/exploded.js";
 import { chatPublic, chatAdmin } from "./chat.js";
 import tryPage from "./try.js";
 import { sample } from "./sample.js";
@@ -175,13 +175,26 @@ function redact(d) {
 }
 async function brian(req, env, ctx) {
   const url = new URL(req.url), t = TEMPLATES[url.searchParams.get('t')] ? url.searchParams.get('t') : 'exploded';
-  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=7'); // bump v to bust cache after template changes
+  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=9'); // bump v to bust cache after template changes
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
   try { h = brand(TEMPLATES[t](summarize({ ...redact(await data(env)), serverToken: true }))); }
   catch (e) { return new Response('Brian\'s bill is unavailable right now. Try the sample instead: /try/demo', { status: 502 }); }
   h = h.replace(/href="\/api\/data"/g, 'href="/"').replace(/href="\?t=/g, 'href="/brian?t=').replace(/<body([^>]*)>/, '<body$1>' + BRIAN_BANNER).replace('Your bill, exploded', 'Brian\'s bill, exploded');
   const res = new Response(h, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+  ctx.waitUntil(caches.default.put(key, res.clone()));
+  return res;
+}
+
+
+// Landing: tap-the-cloud intro built from Brian's real (redacted) bill. Whole page cached 1h; falls back to plain page.
+async function landing(env, ctx) {
+  const key = new Request('https://cfcost.com/?landing&v=4');
+  const hit = await caches.default.match(key); if (hit) return hit;
+  let h;
+  try { h = tryPage(diagram(summarize({ ...redact(await data(env)), serverToken: true }), { cta: 'TAP TO FIND OUT' })); }
+  catch { return html(tryPage()); }
+  const res = new Response(h, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=600' } });
   ctx.waitUntil(caches.default.put(key, res.clone()));
   return res;
 }
@@ -194,7 +207,8 @@ export default {
     if (path === "/favicon.ico" || path === "/favicon.svg") return new Response(FAVICON_SVG, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
     if (path === "/card.png") return new Response(Uint8Array.from(atob(CARD_PNG_B64), c => c.charCodeAt(0)), { headers: { "content-type": "image/png", "cache-control": "public, max-age=86400" } });
     const pub = await chatPublic(req, env, path); if (pub) return pub;
-    if (path === "/" || path === "/try") return html(tryPage());
+    if (path === "/") return landing(env, ctx);
+    if (path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
     if (path === "/try/demo") return demo(new URL(req.url));
     if (path === "/brian") return brian(req, env, ctx);

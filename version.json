@@ -1,7 +1,12 @@
 {
-  "build": 6,
-  "lastUpdated": "2026-10-06T18:43:28Z",
+  "build": 7,
+  "lastUpdated": "2026-10-06T18:53:03Z",
   "changelog": [
+    {
+      "build": 7,
+      "date": "2026-10-06",
+      "changes": "Landing: tap the cloud \u2192 Brian's real bill explodes \u2192 @brianball credit \u2192 See what you pay"
+    },
     {
       "build": 6,
       "date": "2026-10-06",

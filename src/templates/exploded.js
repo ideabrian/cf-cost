@@ -32,7 +32,8 @@ function pick(name) {
 const PROMPT = `Help me make a read-only Cloudflare API token for cfcost.com. Open this pre-filled link (it only ticks Read permissions): ${TOKEN_URL} . Scroll down, click Continue to summary, then Create Token. Don't add any Edit permissions. Then paste the token into https://cfcost.com and click Show my bill. Never post the token anywhere else.`;
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
-export default function exploded(s) {
+// The diagram alone (used by this template and the landing page). Needs DIAGRAM_CSS + tokens --ink --dim --line --cloud --bad.
+export function diagram(s, { cta = '' } = {}) {
   // Paid meters always show. Free ones: the 4 closest to their limit show, the rest fold into one "+N more" item.
   const meter = m => ({ name: short(m.service), cost: m.cost, pct: m.pct || 0, note: m.cost > 0 || m.included == null ? `${money(m.cost)} · ${num(m.used || 0)} ${m.unit}` : `$0 · ${num(m.used || 0)} of ${num(m.included)} free (${((m.pct || 0) * 100).toFixed(0)}%)` });
   const paid = s.meters.filter(m => m.cost > 0).map(meter);
@@ -61,6 +62,32 @@ export default function exploded(s) {
 <g class="tag${it.cost > 0 ? ' paid' : ''}" style="--i:${i}"><path class="lead" d="M${ex.toFixed(0)} ${ly - 5} L${sx.toFixed(0)} ${iy}"/><circle class="dot" cx="${sx.toFixed(0)}" cy="${iy}" r="3"/><text class="lbl" x="${lx}" y="${ly}">${esc(name)}</text><text class="note" x="${lx}" y="${ly + 16}">${esc(note)}</text></g>`;
   }).join('\n');
   const total = s.base + s.overage;
+  const count = items.length + (rest.length > 1 ? rest.length - 1 : 0);
+  const svg = `<svg viewBox="0 0 1000 ${H}" data-h="${H}" data-cy="${cy}" role="img" aria-label="Exploded diagram of this Cloudflare bill: ${count} charges, ${money(total)} a month">
+<g class="cl" opacity=".22"><path transform="translate(0 ${cy - 570})" d="M720 690H300a80 80 0 0 1-9-159.5A118 118 0 0 1 497 482a96 96 0 0 1 158 61A76 76 0 0 1 720 690z" fill="var(--cloud)"/></g>
+<g class="sum"><text x="500" y="${cy + 20}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="30" fill="var(--cloud)">YOUR BILL</text>
+<text x="500" y="${cy + 66}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="44" fill="var(--ink)">${money(total)}<tspan font-size="20" fill="var(--dim)"> / mo</tspan></text></g>
+${cta ? `<text class="cta" x="500" y="${cy + 40}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="40" fill="#fff">${esc(cta)}</text>` : ''}
+${parts}
+</svg>`;
+  return { svg, count, total };
+}
+
+export const DIAGRAM_CSS = `.fig{overflow-x:auto}.fig svg{display:block;width:100%;min-width:640px;height:auto}
+.lbl{font:500 15px "DM Mono",monospace;fill:var(--ink)}.note{font:12px "DM Mono",monospace;fill:var(--dim)}
+.paid .note{fill:var(--bad)}
+.lead{stroke:var(--line);stroke-width:1.3;fill:none;stroke-dasharray:3 4}.dot{fill:var(--ink)}
+.free{opacity:.45}
+.bit{animation:pop 1.1s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*70ms)}
+.tag{animation:fade .5s ease both;animation-delay:calc(.7s + var(--i)*70ms)}
+@keyframes pop{from{transform:translate(var(--dx),var(--dy)) scale(.2) rotate(40deg)}}
+@keyframes fade{from{opacity:0}}
+.cl{animation:kick .5s ease-out both;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes kick{0%{transform:scale(1.08,.9)}60%{transform:scale(.97,1.04)}}
+@media (prefers-reduced-motion:reduce){.bit,.tag,.cl{animation:none}}`;
+
+export default function exploded(s) {
+  const { svg, count } = diagram(s);
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cloudflare Spend</title><meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Mono:wght@400;500&display=swap">
@@ -71,18 +98,8 @@ export default function exploded(s) {
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "DM Mono",ui-monospace,monospace}
 .w{max-width:1040px;margin:0 auto;padding:32px 16px 48px;display:grid;gap:12px}
 h1{font:400 clamp(32px,6vw,60px)/1 "Bowlby One",Impact,sans-serif;margin:0}
+${DIAGRAM_CSS}
 .sub{color:var(--dim);margin:0}
-.fig{overflow-x:auto}.fig svg{display:block;width:100%;min-width:640px;height:auto}
-.lbl{font:500 15px "DM Mono",monospace;fill:var(--ink)}.note{font:12px "DM Mono",monospace;fill:var(--dim)}
-.paid .note{fill:var(--bad)}
-.lead{stroke:var(--line);stroke-width:1.3;fill:none;stroke-dasharray:3 4}.dot{fill:var(--ink)}
-.free{opacity:.45}
-.bit{animation:pop 1.1s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*70ms)}
-.tag{animation:fade .5s ease both;animation-delay:calc(.7s + var(--i)*70ms)}
-@keyframes pop{from{transform:translate(var(--dx),var(--dy)) scale(.2) rotate(40deg)}}
-@keyframes fade{from{opacity:0}}
-.cl{animation:kick .5s ease-out both;transform-origin:500px ${cy + 60}px}
-@keyframes kick{0%{transform:scale(1.08,.9)}60%{transform:scale(.97,1.04)}}
 nav a,button{color:var(--ink)}
 button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
 .bar{justify-self:center;width:min(560px,100%);display:flex;align-items:center;gap:12px;background:#111;color:#e9e6df;border-radius:999px;padding:6px 6px 6px 16px;margin-top:-8px;font:500 12px "DM Mono",monospace;letter-spacing:.08em}
@@ -95,17 +112,12 @@ button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;bord
 .safe h2{margin:0;font:400 20px "Bowlby One",Impact,sans-serif;color:#3ddc84}
 .safe dl{margin:0;display:grid;gap:10px}.safe dt{font-weight:500;color:#fff}.safe dd{margin:2px 0 0;color:#b9b5ab}
 .safe a{color:#3ddc84}.safe button{justify-self:start;font:500 13px "DM Mono",monospace;background:#3ddc84;color:#111;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
-@media (prefers-reduced-motion:reduce){.bit,.tag,.cl,.led{animation:none}}
+@media (prefers-reduced-motion:reduce){.led{animation:none}}
 </style></head><body><div class="w">
 <h1>Your bill, exploded</h1>
-<p class="sub">Period from ${esc(s.periodStart)}. ${items.length + (rest.length > 1 ? rest.length - 1 : 0)} charges. Red notes cost money; faded ones are still inside the free tier.</p>
+<p class="sub">Period from ${esc(s.periodStart)}. ${count} charges. Red notes cost money; faded ones are still inside the free tier.</p>
 <button id="again" type="button">Detonate again</button>
-<div class="fig" id="fig"><svg viewBox="0 0 1000 ${H}" role="img" aria-label="Exploded diagram of this Cloudflare bill: ${items.length} charges, ${money(total)} a month">
-<g class="cl" opacity=".22"><path transform="translate(0 ${cy - 570})" d="M720 690H300a80 80 0 0 1-9-159.5A118 118 0 0 1 497 482a96 96 0 0 1 158 61A76 76 0 0 1 720 690z" fill="var(--cloud)"/></g>
-<text x="500" y="${cy + 20}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="30" fill="var(--cloud)">YOUR BILL</text>
-<text x="500" y="${cy + 66}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="44" fill="var(--ink)">${money(total)}<tspan font-size="20" fill="var(--dim)"> / mo</tspan></text>
-${parts}
-</svg></div>
+<div class="fig" id="fig">${svg}</div>
 <div class="bar"><button type="button" id="safeBtn" aria-expanded="false" aria-controls="safe"><i class="led"></i><span>${s.serverToken ? 'READ-ONLY · TOKEN KEPT SECRET' : 'READ-ONLY · NOTHING STORED'}</span></button><a href="?t=receipt">Receipt →</a></div>
 <div class="safe" id="safe" hidden><h2>Why this is safe</h2><dl>
 <dt>Read-only token</dt><dd>It can view billing and usage. It can't change, deploy or delete anything in your account.</dd>
