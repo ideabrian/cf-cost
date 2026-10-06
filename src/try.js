@@ -1,5 +1,6 @@
 import { LOGO, ICON_LINK, CREDIT } from './brand.js';
 import { DIAGRAM_CSS } from './templates/exploded.js';
+import { PRINTER_CSS } from './printer.js';
 
 // Public /try page: visitor pastes a read-only token, it stays in this tab (sessionStorage), the worker uses it
 // for one render and forgets it. Nothing stored server-side.
@@ -36,6 +37,7 @@ input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;bac
 .brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-decoration:none;font:700 18px system-ui;letter-spacing:-.01em}
 #err{color:var(--bad)}small{font-size:13px}
 ${intro ? `${DIAGRAM_CSS}
+${PRINTER_CSS}
 .stage{max-width:1040px;margin:0 auto;padding:24px 16px 8px;display:grid;gap:14px;--ink:var(--fg);--cloud:#f38020;justify-items:center;text-align:center}
 .stage .brand{justify-self:start}
 .stage h1{font:400 clamp(30px,6vw,56px)/1.05 "Bowlby One",Impact,sans-serif;letter-spacing:0;text-wrap:balance}
@@ -57,6 +59,7 @@ ${intro ? `${DIAGRAM_CSS}
 <div class="fig" id="sfig">${intro.svg}</div>
 <script>(()=>{const f=document.getElementById('sfig'),v=f.querySelector('svg'),cy=+v.dataset.cy;f.classList.add('idle');v.setAttribute('viewBox','190 '+(cy-200)+' 620 340');v.setAttribute('tabindex','0');v.setAttribute('aria-label','Tap the cloud to see a real Cloudflare bill')})()</script>
 <div class="after" id="after">
+${intro.printer ? intro.printer.html : ''}
 <p>These are real costs from <a href="https://x.com/intent/follow?screen_name=brianball" target="_blank" rel="noopener">@brianball</a>'s Cloudflare account this month: ${intro.count} charges, ${'$' + intro.total.toFixed(2)} a month. Names are hidden.</p>
 <button class="go" id="yoursBtn" type="button">See what you pay →</button>
 <p><small><a href="/brian">Explore Brian's bill</a> · <a href="/try/demo">Sample account</a></small></p>
@@ -88,6 +91,7 @@ const from=[190,cy-200,620,340],to=[0,0,1000,H],t0=performance.now(),D=matchMedi
 f.classList.remove('idle');(function step(t){const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);v.setAttribute('viewBox',from.map((x,i)=>x+(to[i]-x)*e).join(' '));if(k<1)requestAnimationFrame(step)})(t0);
 setTimeout(()=>{a.hidden=false;a.scrollIntoView({behavior:'smooth',block:'nearest'})},1600)}
 v.addEventListener('click',boom);v.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();boom()}});
+${intro.printer ? intro.printer.js : ''}
 document.getElementById('yoursBtn').onclick=()=>{m.hidden=false;m.scrollIntoView({behavior:'smooth'});setTimeout(()=>document.getElementById('tok').focus({preventScroll:true}),400)};})();` : ''}
 const K='cfcost_token',f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');
 const t0=new URLSearchParams(location.search).get('t');

@@ -1,5 +1,6 @@
 import { esc, money, num, short } from '../lib.js';
 import { TOKEN_URL } from '../try.js';
+import { printer, PRINTER_CSS } from '../printer.js';
 
 // Exploded: your bill as an exploded-view diagram. Every charge bursts out of the orange cloud, labeled.
 // Layout can't collide: labels live only in two fixed gutters (x<250, x>750), one per 100px row, clipped to fit;
@@ -88,6 +89,12 @@ export const DIAGRAM_CSS = `.fig{overflow-x:auto}.fig svg{display:block;width:10
 
 export default function exploded(s) {
   const { svg, count } = diagram(s);
+  const pr = printer(s, { who: s.serverToken ? '@brianball' : '', safe: `<div class="safe" id="safe" hidden><h2>Why this is safe</h2><dl>
+<dt>Read-only token</dt><dd>It can view billing and usage. It can't change, deploy or delete anything in your account.</dd>
+${s.serverToken ? `<dt>Token kept secret</dt><dd>This page uses Brian's read-only token, stored server-side as an encrypted Cloudflare secret. Visitors never see it, and the page is cached so it's rarely used. Yours would work differently: it stays in your browser tab and is never stored. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>` : `<dt>Nothing stored</dt><dd>The token stays in this browser tab. Our worker uses it for one page load and forgets it: no database, no logs. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>`}
+<dt>Share the picture, not the token</dt><dd>Post this diagram anywhere; what you spend on Cloudflare is nobody's secret. Keep the token itself private, since anyone holding it can read your invoices and domain list.</dd>
+<dt>Let your AI make the token</dt><dd>Paste this into Claude (or any agent that can use your browser).</dd></dl>
+<button type="button" id="copyPrompt">Copy prompt</button></div>` });
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cloudflare Spend</title><meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Mono:wght@400;500&display=swap">
@@ -102,12 +109,7 @@ ${DIAGRAM_CSS}
 .sub{color:var(--dim);margin:0}
 nav a,button{color:var(--ink)}
 button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
-.bar{justify-self:center;width:min(560px,100%);display:flex;align-items:center;gap:12px;background:#111;color:#e9e6df;border-radius:999px;padding:6px 6px 6px 16px;margin-top:-8px;font:500 12px "DM Mono",monospace;letter-spacing:.08em}
-.bar button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:6px 0}
-.bar button:focus-visible,.bar a:focus-visible,.safe button:focus-visible{outline:2px solid #3ddc84;outline-offset:3px}
-.led{width:10px;height:10px;border-radius:50%;background:#3ddc84;box-shadow:0 0 6px #3ddc84,0 0 14px #3ddc84;animation:glow 2.4s ease-in-out infinite;flex:none}
-@keyframes glow{50%{box-shadow:0 0 3px #3ddc84,0 0 6px #3ddc84;opacity:.75}}
-.bar a{color:#111;background:#e9e6df;text-decoration:none;border-radius:999px;padding:6px 14px;white-space:nowrap}
+${PRINTER_CSS}
 .safe[hidden]{display:none}.safe{justify-self:center;width:min(560px,100%);background:#111;color:#e9e6df;border-radius:16px;padding:18px 20px;display:grid;gap:12px;font-size:13px}
 .safe h2{margin:0;font:400 20px "Bowlby One",Impact,sans-serif;color:#3ddc84}
 .safe dl{margin:0;display:grid;gap:10px}.safe dt{font-weight:500;color:#fff}.safe dd{margin:2px 0 0;color:#b9b5ab}
@@ -118,17 +120,11 @@ button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;bord
 <p class="sub">Period from ${esc(s.periodStart)}. ${count} charges. Red notes cost money; faded ones are still inside the free tier.</p>
 <button id="again" type="button">Detonate again</button>
 <div class="fig" id="fig">${svg}</div>
-<div class="bar"><button type="button" id="safeBtn" aria-expanded="false" aria-controls="safe"><i class="led"></i><span>${s.serverToken ? 'READ-ONLY · TOKEN KEPT SECRET' : 'READ-ONLY · NOTHING STORED'}</span></button><a href="?t=receipt">Receipt →</a></div>
-<div class="safe" id="safe" hidden><h2>Why this is safe</h2><dl>
-<dt>Read-only token</dt><dd>It can view billing and usage. It can't change, deploy or delete anything in your account.</dd>
-${s.serverToken ? `<dt>Token kept secret</dt><dd>This page uses Brian's read-only token, stored server-side as an encrypted Cloudflare secret. Visitors never see it, and the page is cached so it's rarely used. Yours would work differently: it stays in your browser tab and is never stored. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>` : `<dt>Nothing stored</dt><dd>The token stays in this browser tab. Our worker uses it for one page load and forgets it: no database, no logs. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>`}
-<dt>Share the picture, not the token</dt><dd>Post this diagram anywhere; what you spend on Cloudflare is nobody's secret. Keep the token itself private, since anyone holding it can read your invoices and domain list.</dd>
-<dt>Let your AI make the token</dt><dd>Paste this into Claude (or any agent that can use your browser).</dd></dl>
-<button type="button" id="copyPrompt">Copy prompt</button></div>
+${pr.html}
 <nav class="sub"><a href="?t=ledger">ledger</a> · <a href="?t=terminal">terminal</a> · <a href="?t=receipt">receipt</a> · <a href="?t=exploded">exploded</a></nav>
 </div>
 <script>document.getElementById('again').onclick=()=>{const f=document.getElementById('fig'),h=f.innerHTML;f.innerHTML='';void f.offsetWidth;f.innerHTML=h}
-const sb=document.getElementById('safeBtn'),sp=document.getElementById('safe');sb.onclick=()=>{sp.hidden=!sp.hidden;sb.setAttribute('aria-expanded',!sp.hidden)};
+${pr.js}
 const P=${JSON.stringify(PROMPT)};document.getElementById('copyPrompt').onclick=async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText(P);b.textContent='Copied'}catch{b.textContent='Copy failed: select the text below';const t=document.createElement('textarea');t.value=P;t.rows=5;t.style.cssText='width:100%;font:12px monospace';b.after(t);t.select()}}</script>
 </body></html>`;
 }

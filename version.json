@@ -1,7 +1,12 @@
 {
-  "build": 7,
-  "lastUpdated": "2026-10-06T18:53:03Z",
+  "build": 8,
+  "lastUpdated": "2026-10-06T18:59:50Z",
   "changelog": [
+    {
+      "build": 8,
+      "date": "2026-10-06",
+      "changes": "Receipt printer under the cloud: print, tear, stamp, share card PNG (landing + exploded)"
+    },
     {
       "build": 7,
       "date": "2026-10-06",

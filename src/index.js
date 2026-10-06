@@ -6,6 +6,7 @@ import terminal from "./templates/terminal.js";
 import receipt from "./templates/receipt.js";
 import exploded, { diagram } from "./templates/exploded.js";
 import { chatPublic, chatAdmin } from "./chat.js";
+import { printer } from "./printer.js";
 import tryPage from "./try.js";
 import { sample } from "./sample.js";
 import { brand, FAVICON_SVG } from "./brand.js";
@@ -175,7 +176,7 @@ function redact(d) {
 }
 async function brian(req, env, ctx) {
   const url = new URL(req.url), t = TEMPLATES[url.searchParams.get('t')] ? url.searchParams.get('t') : 'exploded';
-  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=9'); // bump v to bust cache after template changes
+  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=11'); // bump v to bust cache after template changes
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
   try { h = brand(TEMPLATES[t](summarize({ ...redact(await data(env)), serverToken: true }))); }
@@ -189,10 +190,10 @@ async function brian(req, env, ctx) {
 
 // Landing: tap-the-cloud intro built from Brian's real (redacted) bill. Whole page cached 1h; falls back to plain page.
 async function landing(env, ctx) {
-  const key = new Request('https://cfcost.com/?landing&v=4');
+  const key = new Request('https://cfcost.com/?landing&v=6');
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
-  try { h = tryPage(diagram(summarize({ ...redact(await data(env)), serverToken: true }), { cta: 'TAP TO FIND OUT' })); }
+  try { const b = summarize({ ...redact(await data(env)), serverToken: true }); h = tryPage({ ...diagram(b, { cta: 'TAP TO FIND OUT' }), printer: printer(b, { who: '@brianball' }) }); }
   catch { return html(tryPage()); }
   const res = new Response(h, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=600' } });
   ctx.waitUntil(caches.default.put(key, res.clone()));
