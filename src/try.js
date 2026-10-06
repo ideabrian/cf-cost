@@ -41,7 +41,7 @@ input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;bac
 <a class="btn" href="${TOKEN_URL}" target="_blank" rel="noopener">Create token on Cloudflare ↗</a></li>
 <li><b>2 · Paste it</b><form id="f" style="display:grid;gap:10px">
 <input id="tok" type="password" autocomplete="off" spellcheck="false" placeholder="Paste token" required>
-<div class="looks">${['ledger', 'terminal', 'receipt', 'exploded'].map((t, i) => `<label><input type="radio" name="t" value="${t}"${i ? '' : ' checked'}><div class="pv"><iframe src="/try/demo?t=${t}&thumb=1" loading="lazy" tabindex="-1" aria-hidden="true" title=""></iframe></div><span>${t[0].toUpperCase() + t.slice(1)}</span></label>`).join('')}</div>
+<div class="looks">${['exploded', 'ledger', 'terminal', 'receipt'].map((t, i) => `<label><input type="radio" name="t" value="${t}"${i ? '' : ' checked'}><div class="pv"><iframe src="/try/demo?t=${t}&thumb=1" loading="lazy" tabindex="-1" aria-hidden="true" title=""></iframe></div><span>${t[0].toUpperCase() + t.slice(1)}</span></label>`).join('')}</div>
 <small class="dim">Pick a look. <a href="/try/demo" target="_blank" style="color:var(--accent)">See a full sample ↗</a></small>
 <button id="go">Show my bill</button><p id="err" role="alert"></p></form></li>
 </ol>

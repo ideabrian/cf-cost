@@ -1,7 +1,12 @@
 {
-  "build": 3,
-  "lastUpdated": "2026-10-06T17:53:24Z",
+  "build": 4,
+  "lastUpdated": "2026-10-06T17:58:42Z",
   "changelog": [
+    {
+      "build": 4,
+      "date": "2026-10-06",
+      "changes": "Exploded is default view; read-only status bar with safety panel + receipt link"
+    },
     {
       "build": 3,
       "date": "2026-10-06",

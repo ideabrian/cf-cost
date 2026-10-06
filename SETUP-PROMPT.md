@@ -9,7 +9,7 @@ Set up "cf-cost", a password-protected Cloudflare spend dashboard, on MY Cloudfl
    Tell me to click Create Token and paste it back. Never echo it.
 3. Test it: GET https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/billing/history must return success.
 4. Get the code: `npx degit ideabrian/cf-cost cf-cost && cd cf-cost`
-5. `npm install`. Ask me which look I want: ledger (clean cards), terminal (green phosphor), receipt (paper till slip). Set `TEMPLATE` in cloudflare.config.ts.
+5. `npm install`. Ask me which look I want: exploded (default; diagram of every charge), ledger (clean cards), terminal (green phosphor), receipt (paper till slip). Set `TEMPLATE` in cloudflare.config.ts.
 6. Write `.dev.vars` (gitignored) with CF_BILLING_TOKEN=<token> and DASH_PASSWORD=<random 20 chars>, then `npx cf deploy --secrets-file .dev.vars`. Don't print either.
 7. Open the URL + `/me`. Login is any username + that password; give me the password once, and tell me to store it in my password manager.
 ```

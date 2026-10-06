@@ -30,7 +30,7 @@ Copy the prompt in [SETUP-PROMPT.md](SETUP-PROMPT.md) into Claude Code. It opens
 5. Domains panel needs Registrar: Domains → Read (the link above includes it; older tokens: edit and add it).
 6. Open `https://cf-cost.<you>.workers.dev/me`. Any username, your password. (`/` is the public paste-a-token page.)
 
-Options (`cloudflare.config.ts`): `TEMPLATE` = `ledger` | `terminal` | `receipt`. `CF_ACCOUNT_ID` if your token sees more than one account.
+Options (`cloudflare.config.ts`): `TEMPLATE` = `exploded` (default) | `ledger` | `terminal` | `receipt`. `CF_ACCOUNT_ID` if your token sees more than one account.
 
 ## What it can't see
 

@@ -1,4 +1,5 @@
 import { esc, money, num, short } from '../lib.js';
+import { TOKEN_URL } from '../try.js';
 
 // Exploded: your bill as an exploded-view diagram. Every charge bursts out of the orange cloud, labeled.
 // Layout can't collide: labels live only in two fixed gutters (x<250, x>750), one per 100px row, clipped to fit;
@@ -27,6 +28,7 @@ function pick(name) {
   if (/\bai\b|neuron/.test(n)) return ['chip', '#c2341b'];
   return ['coin', '#f38020'];
 }
+const PROMPT = `Help me make a read-only Cloudflare API token for cfcost.com. Open this pre-filled link (it only ticks Read permissions): ${TOKEN_URL} . Scroll down, click Continue to summary, then Create Token. Don't add any Edit permissions. Then paste the token into https://cfcost.com and click Show my bill. Never post the token anywhere else.`;
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 export default function exploded(s) {
@@ -75,7 +77,17 @@ h1{font:400 clamp(32px,6vw,60px)/1 "Bowlby One",Impact,sans-serif;margin:0}
 @keyframes kick{0%{transform:scale(1.08,.9)}60%{transform:scale(.97,1.04)}}
 nav a,button{color:var(--ink)}
 button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
-@media (prefers-reduced-motion:reduce){.bit,.tag,.cl{animation:none}}
+.bar{justify-self:center;width:min(560px,100%);display:flex;align-items:center;gap:12px;background:#111;color:#e9e6df;border-radius:999px;padding:6px 6px 6px 16px;margin-top:-8px;font:500 12px "DM Mono",monospace;letter-spacing:.08em}
+.bar button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:6px 0}
+.bar button:focus-visible,.bar a:focus-visible,.safe button:focus-visible{outline:2px solid #3ddc84;outline-offset:3px}
+.led{width:10px;height:10px;border-radius:50%;background:#3ddc84;box-shadow:0 0 6px #3ddc84,0 0 14px #3ddc84;animation:glow 2.4s ease-in-out infinite;flex:none}
+@keyframes glow{50%{box-shadow:0 0 3px #3ddc84,0 0 6px #3ddc84;opacity:.75}}
+.bar a{color:#111;background:#e9e6df;text-decoration:none;border-radius:999px;padding:6px 14px;white-space:nowrap}
+.safe{justify-self:center;width:min(560px,100%);background:#111;color:#e9e6df;border-radius:16px;padding:18px 20px;display:grid;gap:12px;font-size:13px}
+.safe h2{margin:0;font:400 20px "Bowlby One",Impact,sans-serif;color:#3ddc84}
+.safe dl{margin:0;display:grid;gap:10px}.safe dt{font-weight:500;color:#fff}.safe dd{margin:2px 0 0;color:#b9b5ab}
+.safe a{color:#3ddc84}.safe button{justify-self:start;font:500 13px "DM Mono",monospace;background:#3ddc84;color:#111;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.bit,.tag,.cl,.led{animation:none}}
 </style></head><body><div class="w">
 <h1>Your bill, exploded</h1>
 <p class="sub">Period from ${esc(s.periodStart)}. ${items.length} charges. Red notes cost money; faded ones are still inside the free tier.</p>
@@ -86,8 +98,17 @@ button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;bord
 <text x="500" y="${cy + 66}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="44" fill="var(--ink)">${money(total)}<tspan font-size="20" fill="var(--dim)"> / mo</tspan></text>
 ${parts}
 </svg></div>
+<div class="bar"><button type="button" id="safeBtn" aria-expanded="false" aria-controls="safe"><i class="led"></i><span>READ-ONLY · NOTHING STORED</span></button><a href="?t=receipt">Receipt →</a></div>
+<div class="safe" id="safe" hidden><h2>Why this is safe</h2><dl>
+<dt>Read-only token</dt><dd>It can view billing and usage. It can't change, deploy or delete anything in your account.</dd>
+<dt>Nothing stored</dt><dd>The token stays in this browser tab. Our worker uses it for one page load and forgets it: no database, no logs. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>
+<dt>Share the picture, not the token</dt><dd>Post this diagram anywhere; what you spend on Cloudflare is nobody's secret. Keep the token itself private, since anyone holding it can read your invoices and domain list.</dd>
+<dt>Let your AI make the token</dt><dd>Paste this into Claude (or any agent that can use your browser).</dd></dl>
+<button type="button" id="copyPrompt">Copy prompt</button></div>
 <nav class="sub"><a href="?t=ledger">ledger</a> · <a href="?t=terminal">terminal</a> · <a href="?t=receipt">receipt</a> · <a href="?t=exploded">exploded</a></nav>
 </div>
-<script>document.getElementById('again').onclick=()=>{const f=document.getElementById('fig'),h=f.innerHTML;f.innerHTML='';void f.offsetWidth;f.innerHTML=h}</script>
+<script>document.getElementById('again').onclick=()=>{const f=document.getElementById('fig'),h=f.innerHTML;f.innerHTML='';void f.offsetWidth;f.innerHTML=h}
+const sb=document.getElementById('safeBtn'),sp=document.getElementById('safe');sb.onclick=()=>{sp.hidden=!sp.hidden;sb.setAttribute('aria-expanded',!sp.hidden)};
+const P=${JSON.stringify(PROMPT)};document.getElementById('copyPrompt').onclick=async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText(P);b.textContent='Copied'}catch{b.textContent='Copy failed: select the text below';const t=document.createElement('textarea');t.value=P;t.rows=5;t.style.cssText='width:100%;font:12px monospace';b.after(t);t.select()}}</script>
 </body></html>`;
 }

@@ -8,7 +8,7 @@ export default defineConfig({
 		compatibilityDate: "2026-10-01",
 		entrypoint: "src/index.js",
 		env: {
-			TEMPLATE: bindings.text("ledger"),
+			TEMPLATE: bindings.text("exploded"),
 			// /try/render: 10 renders per minute per IP
 			TRY_LIMIT: bindings.rateLimit({ namespace: "1001", simple: { limit: 10, period: 60 } }),
 			// Feedback chat (src/chat.js). Bound by name so no IDs live in this public repo.
