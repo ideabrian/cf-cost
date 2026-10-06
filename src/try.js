@@ -1,4 +1,4 @@
-import { LOGO, ICON_LINK } from './brand.js';
+import { LOGO, ICON_LINK, CREDIT } from './brand.js';
 
 // Public /try page: visitor pastes a read-only token, it stays in this tab (sessionStorage), the worker uses it
 // for one render and forgets it. Nothing stored server-side.
@@ -48,6 +48,7 @@ input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;bac
 <p>Deploy CF Cost to your Cloudflare account. Your token never leaves your account, and the dashboard is behind your own password at <code>/me</code>.</p>
 <a class="btn alt" href="https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost" target="_blank" rel="noopener">Deploy to Cloudflare ↗</a></section>
 <p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. <a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">Open source</a>.<br>CF Cost is an independent tool, not affiliated with Cloudflare.</small></p>
+<p class="dim" style="text-align:center"><small>${CREDIT}</small></p>
 </main>
 <script>
 const K='cfcost_token',f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');
