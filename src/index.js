@@ -161,7 +161,9 @@ async function guest(req, env) {
 
 export default {
   async fetch(req, env) {
-    const path = new URL(req.url).pathname;
+    const u0 = new URL(req.url);
+    if (u0.hostname === "www.cfcost.com") { u0.hostname = "cfcost.com"; return Response.redirect(u0.toString(), 301); }
+    const path = u0.pathname;
     if (path === "/favicon.ico") return new Response(null, { status: 204 });
     if (path === "/" || path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
