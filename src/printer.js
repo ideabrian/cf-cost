@@ -12,7 +12,7 @@ export function printer(s, { who = '', safe = '' } = {}) {
   const free = s.meters.length - paid.length;
   if (free) rows.push([`${free}× inside free tier`, '$0.00']);
   const total = s.base + s.overage;
-  const data = { who, period: s.periodStart, rows, total: money(total), renew: s.domains?.length ? money(s.renew12) : '', stamp: s.overage > 0 ? 'PAID' : 'FREE TIER ✓' };
+  const data = { who, period: s.periodStart, rows, total: money(total), renew: s.domains?.length ? money(s.renew12) : '', stamp: s.overage > 0 ? 'PAID' : total > 0 ? 'NO OVERAGE ✓' : 'FREE ✓' };
   const row = (a, b, c = '') => `<div class="pr-row ${c}"><span>${esc(a)}</span><span>${esc(b)}</span></div>`;
   const html = `<div class="printer" id="printer">
 <div class="pr-bar">${safe ? '<button type="button" class="pr-safe" id="safeBtn" aria-expanded="false" aria-controls="safe"><i class="led"></i><span>READ-ONLY · WHY IT\'S SAFE</span></button>' : '<span class="pr-safe" style="cursor:default"><i class="led"></i><span>READ-ONLY · CF COST</span></span>'}
