@@ -1,7 +1,12 @@
 {
-  "build": 12,
-  "lastUpdated": "2026-10-06T19:23:22Z",
+  "build": 13,
+  "lastUpdated": "2026-10-06T19:28:32Z",
   "changelog": [
+    {
+      "build": 13,
+      "date": "2026-10-06",
+      "changes": "Center text in cloud (measured bbox, optical center); tighter gap above printer"
+    },
     {
       "build": 12,
       "date": "2026-10-06",

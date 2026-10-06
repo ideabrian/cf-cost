@@ -49,7 +49,7 @@ ${PRINTER_CSS}
 <a href="/" class="brand">${LOGO}<span>CF Cost</span></a>
 <h1>What does Cloudflare cost me?</h1>
 <div class="fig" id="sfig">${intro.svg}</div>
-<script>(()=>{const f=document.getElementById('sfig'),v=f.querySelector('svg'),cy=+v.dataset.cy;f.classList.add('idle');v.setAttribute('viewBox','290 '+(cy-125)+' 420 230');v.setAttribute('tabindex','0');v.setAttribute('aria-label','Tap the cloud to see a real Cloudflare bill')})()</script>
+<script>(()=>{const f=document.getElementById('sfig'),v=f.querySelector('svg'),cy=+v.dataset.cy;f.classList.add('idle');v.setAttribute('viewBox','290 '+(cy-137)+' 420 230');v.setAttribute('tabindex','0');v.setAttribute('aria-label','Tap the cloud to see a real Cloudflare bill')})()</script>
 <div class="after" id="after">
 ${intro.printer ? intro.printer.html : ''}
 <p>These are real costs from <a href="https://x.com/intent/follow?screen_name=brianball" target="_blank" rel="noopener">@brianball</a>'s Cloudflare account this month: ${intro.count} charges, ${'$' + intro.total.toFixed(2)} a month. Names are hidden.</p>
@@ -78,7 +78,7 @@ ${intro ? '' : `<a href="/" class="brand">${LOGO}<span>CF Cost</span></a>`}
 ${intro ? `(()=>{const f=document.getElementById('sfig'),v=f.querySelector('svg'),H=+v.dataset.h,cy=+v.dataset.cy,a=document.getElementById('after'),m=document.querySelector('main.w');
 a.hidden=true;m.hidden=true;let done=false;
 function boom(){if(done)return;done=true;v.removeAttribute('tabindex');v.setAttribute('aria-label',v.getAttribute('aria-label').replace('Tap the cloud to see','Exploded diagram of'));
-const from=[290,cy-125,420,230],to=[0,0,1000,H],t0=performance.now(),D=matchMedia('(prefers-reduced-motion:reduce)').matches?1:800;
+const from=[290,cy-137,420,230],to=[0,0,1000,H],t0=performance.now(),D=matchMedia('(prefers-reduced-motion:reduce)').matches?1:800;
 f.classList.remove('idle');(function step(t){const k=Math.min(1,(t-t0)/D),e=1-Math.pow(1-k,3);v.setAttribute('viewBox',from.map((x,i)=>x+(to[i]-x)*e).join(' '));if(k<1)requestAnimationFrame(step)})(t0);
 setTimeout(()=>{a.hidden=false;a.scrollIntoView({behavior:'smooth',block:'nearest'})},1600)}
 v.addEventListener('click',boom);v.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();boom()}});
