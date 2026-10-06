@@ -12,6 +12,7 @@ Owner routes (Basic auth, any username, password = DASH_PASSWORD):
 - `/me` — HTML: plans, overage this period, 12-mo invoiced, invoices by month, every usage meter vs included, invoice list
 - `/api/data` — same data as JSON
 - `/favicon.ico` — 204, no auth
+- `/card.png` — 1200×630 social card (og:image), no auth. Source: src/card.js, regen via `python3 scripts/make-card.py`
 
 CF API used: `/accounts/:id/billable-usage`, `/billing/history`, `/subscriptions`, GraphQL `r2OperationsAdaptiveGroups` (R2 ops per bucket+action, billing period → today; needs Account Analytics Read; panel shows hint if missing).
 R2 panel: Class A/B per bucket at list price ($4.50/M A, $0.36/M B; deletes free; free tier account-wide so per-bucket $ is list, not billed). Top action = top billable action. Totals run ~1 day ahead of billing meter.

@@ -1,3 +1,4 @@
+import { CARD_PNG_B64 } from './card.js';
 // cf-cost: Cloudflare spend command & control. Basic auth, live from the billing API, pick a look with ?t=.
 import { summarize } from "./lib.js";
 import ledger from "./templates/ledger.js";
@@ -166,6 +167,7 @@ export default {
     if (u0.hostname === "www.cfcost.com") { u0.hostname = "cfcost.com"; return Response.redirect(u0.toString(), 301); }
     const path = u0.pathname;
     if (path === "/favicon.ico" || path === "/favicon.svg") return new Response(FAVICON_SVG, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
+    if (path === "/card.png") return new Response(Uint8Array.from(atob(CARD_PNG_B64), c => c.charCodeAt(0)), { headers: { "content-type": "image/png", "cache-control": "public, max-age=86400" } });
     if (path === "/" || path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
     if (path === "/try/demo") return demo(new URL(req.url));

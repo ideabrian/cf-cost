@@ -7,6 +7,7 @@ export const TOKEN_URL = 'https://dash.cloudflare.com/profile/api-tokens?permiss
 export default function tryPage() {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CF Cost · what Cloudflare charges you</title>${ICON_LINK}<meta name="description" content="See what Cloudflare actually charges you, in 10 seconds. Read-only token, nothing stored.">
+<meta name="twitter:card" content="summary_large_image"><meta property="og:type" content="website"><meta property="og:url" content="https://cfcost.com/"><meta property="og:title" content="CF Cost · what Cloudflare charges you"><meta property="og:description" content="See what Cloudflare actually charges you, in 10 seconds. Read-only token, nothing stored."><meta property="og:image" content="https://cfcost.com/card.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
 <style>
 :root{--bg:#f4f3ef;--card:#fff;--fg:#1b1b18;--dim:#6b6a63;--line:#dedcd4;--accent:#f38020;--bad:#c2341b;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131311;--card:#1c1c19;--fg:#ecebe6;--dim:#9a988f;--line:#2f2e2a;--accent:#ff9a4a;--bad:#ff6b52;color-scheme:dark}}
