@@ -5,6 +5,7 @@ import terminal from "./templates/terminal.js";
 import receipt from "./templates/receipt.js";
 import tryPage from "./try.js";
 import { sample } from "./sample.js";
+import { brand, FAVICON_SVG } from "./brand.js";
 
 const TEMPLATES = { ledger, terminal, receipt };
 const API = 'https://api.cloudflare.com/client/v4/accounts/';
@@ -140,7 +141,7 @@ const FORGET = `<p style="text-align:center;font:13px system-ui;opacity:.75;padd
 const BANNER = `<div style="position:sticky;top:0;z-index:9;background:#f38020;color:#fff;text-align:center;font:600 14px system-ui;padding:8px 16px">Sample data, not a real account. <a href="/try" style="color:#fff">See yours →</a></div>`;
 function demo(url) {
   const t = TEMPLATES[url.searchParams.get('t')] || ledger;
-  let h = t(summarize(sample())).replace(/href="\/api\/data"/g, 'href="/try"').replace(/href="\?t=/g, 'href="/try/demo?t=');
+  let h = brand(t(summarize(sample()))).replace(/href="\/api\/data"/g, 'href="/try"').replace(/href="\?t=/g, 'href="/try/demo?t=');
   if (!url.searchParams.has('thumb')) h = h.replace(/<body([^>]*)>/, '<body$1>' + BANNER);
   return html(h);
 }
@@ -152,7 +153,7 @@ async function guest(req, env) {
   if (req.method !== 'POST' || !/^[\w-]{20,200}$/.test(tok)) return new Response("That doesn't look like a Cloudflare API token.", { status: 400 });
   try {
     const t = TEMPLATES[new URL(req.url).searchParams.get('t')] || ledger;
-    return html(t(summarize(await data({ CF_BILLING_TOKEN: tok, guest: true }))).replace(/href="\/api\/data"/g, 'href="/try"').replace('</body>', FORGET + '</body>'));
+    return html(brand(t(summarize(await data({ CF_BILLING_TOKEN: tok, guest: true })))).replace(/href="\/api\/data"/g, 'href="/try"').replace('</body>', FORGET + '</body>'));
   } catch (e) {
     const m = /9109|10000|Authentication|Unauthorized/.test(e.message) ? "Cloudflare rejected that token. It needs Billing Read; the button above sets that up." : e.message;
     return new Response(m, { status: 502 });
@@ -164,7 +165,7 @@ export default {
     const u0 = new URL(req.url);
     if (u0.hostname === "www.cfcost.com") { u0.hostname = "cfcost.com"; return Response.redirect(u0.toString(), 301); }
     const path = u0.pathname;
-    if (path === "/favicon.ico") return new Response(null, { status: 204 });
+    if (path === "/favicon.ico" || path === "/favicon.svg") return new Response(FAVICON_SVG, { headers: { "content-type": "image/svg+xml", "cache-control": "public, max-age=86400" } });
     if (path === "/" || path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
     if (path === "/try/demo") return demo(new URL(req.url));
@@ -175,7 +176,7 @@ export default {
       if (url.pathname === '/api/data') return Response.json(d);
       if (url.pathname !== '/me') return new Response('Not found', { status: 404 });
       const t = TEMPLATES[url.searchParams.get("t")] || TEMPLATES[env.TEMPLATE] || ledger;
-      return new Response(t(summarize(d)), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+      return new Response(brand(t(summarize(d))), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     } catch (e) {
       return new Response('Billing API error: ' + e.message, { status: 502 });
     }

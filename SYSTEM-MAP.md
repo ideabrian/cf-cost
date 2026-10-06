@@ -23,6 +23,7 @@ Secrets (worker secrets; owner's source mapping is in local HANDOFF.md):
 Commands: `npx wrangler deploy`
 URL: https://cfcost.com (custom domain attached in CF dash/API, deliberately NOT in wrangler.jsonc so forks/Deploy-button users don't try to claim it; survives deploys; www.cfcost.com also attached via `wrangler deploy --domain`, 301 → apex)
 
+Brand: src/brand.js (logo, /favicon.svg, title prefix "CF Cost", footer "not affiliated with Cloudflare" on every dashboard render).
 Account: auto-detected from token unless CF_ACCOUNT_ID set. Onboarding page: src/try.js. Templates: src/templates/{ledger,terminal,receipt}.js, pick via ?t= or TEMPLATE var.
 Notes: invoice API returns no amount for invoices before 2025-06 (shown as —). No line items via API; large one-offs ≈ domain registrations.
 Domains: /registrar/domains (needs Registrar Domains Read; panel shows hint if missing). Renewal price per TLD via POST /registrar/domain-check on a made-up name.

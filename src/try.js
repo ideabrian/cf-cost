@@ -1,10 +1,12 @@
+import { LOGO, ICON_LINK } from './brand.js';
+
 // Public /try page: visitor pastes a read-only token, it stays in this tab (sessionStorage), the worker uses it
 // for one render and forgets it. Nothing stored server-side.
 export const TOKEN_URL = 'https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22billing%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22registrar_domains%22%2C%22type%22%3A%22read%22%7D%5D&name=cf-cost&accountId=*&zoneId=all';
 
 export default function tryPage() {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Cloudflare Spend</title><meta name="description" content="See what Cloudflare actually charges you, in 10 seconds. Read-only token, nothing stored.">
+<title>CF Cost · what Cloudflare charges you</title>${ICON_LINK}<meta name="description" content="See what Cloudflare actually charges you, in 10 seconds. Read-only token, nothing stored.">
 <style>
 :root{--bg:#f4f3ef;--card:#fff;--fg:#1b1b18;--dim:#6b6a63;--line:#dedcd4;--accent:#f38020;--bad:#c2341b;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#131311;--card:#1c1c19;--fg:#ecebe6;--dim:#9a988f;--line:#2f2e2a;--accent:#ff9a4a;--bad:#ff6b52;color-scheme:dark}}
@@ -25,8 +27,10 @@ input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;bac
 .looks label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 .pv{height:150px;overflow:hidden;position:relative;border-bottom:1px solid var(--line)}
 .pv iframe{width:400%;height:400%;border:0;transform:scale(.25);transform-origin:0 0;pointer-events:none;position:absolute;top:0;left:0}
+.brand{display:flex;align-items:center;gap:8px;color:var(--fg);text-decoration:none;font:700 18px system-ui;letter-spacing:-.01em}
 #err{color:var(--bad)}small{font-size:13px}
 </style></head><body><main class="w">
+<a href="/" class="brand">${LOGO}<span>CF Cost</span></a>
 <h1>What does Cloudflare actually charge you?</h1>
 <p class="dim">Plans, usage vs. what's included, invoices, domain renewals, all on one page. Takes about 10 seconds.</p>
 <ol>
@@ -38,7 +42,7 @@ input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;bac
 <small class="dim">Pick a look. <a href="/try/demo" target="_blank" style="color:var(--accent)">See a full sample ↗</a></small>
 <button id="go">Show my bill</button><p id="err" role="alert"></p></form></li>
 </ol>
-<p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. Prefer your own copy? <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost" style="color:var(--accent)">Deploy it to your account in one click</a> (<a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">open source</a>).</small></p>
+<p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. Prefer your own copy? <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost" style="color:var(--accent)">Deploy it to your account in one click</a> (<a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">open source</a>).<br>CF Cost is an independent tool, not affiliated with Cloudflare.</small></p>
 </main>
 <script>
 const K='cfcost_token',f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');
