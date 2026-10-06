@@ -2,6 +2,6 @@
   "name": "cf-cost",
   "main": "src/index.js",
   "compatibility_date": "2026-10-01",
-  "vars": { "CF_ACCOUNT_ID": "<account-id>" }
-  // secrets: CF_BILLING_TOKEN, DASH_PASSWORD
+  "vars": { "TEMPLATE": "ledger" }
+  // secrets: CF_BILLING_TOKEN, DASH_PASSWORD. Optional var CF_ACCOUNT_ID if the token sees several accounts.
 }

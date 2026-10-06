@@ -16,5 +16,6 @@ Secrets (Forge Vault, category `cloudflare`):
 Commands: `npx wrangler deploy`
 URL: https://cf-cost.<subdomain>.workers.dev
 
+Account: auto-detected from token unless CF_ACCOUNT_ID set. Templates: src/templates/{ledger,terminal,receipt}.js, pick via ?t= or TEMPLATE var.
 Notes: invoice API returns no amount for invoices before 2025-06 (shown as —). No line items via API; large one-offs ≈ domain registrations.
 Not here yet: weekly alert cron, per-worker cost attribution, registrar renewals list.

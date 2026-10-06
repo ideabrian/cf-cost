@@ -7,8 +7,20 @@ import receipt from "./templates/receipt.js";
 const TEMPLATES = { ledger, terminal, receipt };
 const API = 'https://api.cloudflare.com/client/v4/accounts/';
 
+// Account comes from CF_ACCOUNT_ID, or the first account the token can see.
+let acct;
+async function accountId(env) {
+  if (env.CF_ACCOUNT_ID) return env.CF_ACCOUNT_ID;
+  if (!acct) {
+    const j = await (await fetch("https://api.cloudflare.com/client/v4/accounts", { headers: { Authorization: "Bearer " + env.CF_BILLING_TOKEN } })).json();
+    acct = j.result?.[0]?.id;
+    if (!acct) throw new Error("token cannot see any account");
+  }
+  return acct;
+}
+
 async function cf(env, path) {
-  const r = await fetch(API + env.CF_ACCOUNT_ID + path, { headers: { Authorization: 'Bearer ' + env.CF_BILLING_TOKEN } });
+  const r = await fetch(API + await accountId(env) + path, { headers: { Authorization: 'Bearer ' + env.CF_BILLING_TOKEN } });
   const j = await r.json();
   if (!j.success && !Array.isArray(j.result)) throw new Error(path + ': ' + JSON.stringify(j.errors || r.status));
   return j.result || [];
