@@ -1,1 +1,4 @@
 node_modules
+
+# private session notes (personal data); stays local
+HANDOFF.md
