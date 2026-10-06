@@ -2,7 +2,7 @@
 
 **See what Cloudflare is actually charging you.** A password-protected dashboard on your own Cloudflare account: every usage meter against what's included, plans, invoices by month, domain renewal dates and prices, and a warning when anything passes 70%.
 
-**Just want to see your bill?** https://cf-cost.<subdomain>.workers.dev/try (paste a read-only token, nothing stored).
+**Just want to see your bill?** https://cfcost.com (paste a read-only token, nothing stored).
 
 Three looks, switch with `?t=`:
 
@@ -28,7 +28,7 @@ Copy the prompt in [SETUP-PROMPT.md](SETUP-PROMPT.md) into Claude Code. It opens
 3. `npx wrangler deploy`
 4. `npx wrangler secret put CF_BILLING_TOKEN` (paste token) and `npx wrangler secret put DASH_PASSWORD`
 5. Domains panel needs Registrar: Domains → Read (the link above includes it; older tokens: edit and add it).
-6. Open `https://cf-cost.<you>.workers.dev`. Any username, your password.
+6. Open `https://cf-cost.<you>.workers.dev/me`. Any username, your password. (`/` is the public paste-a-token page.)
 
 Options (`wrangler.jsonc` vars): `TEMPLATE` = `ledger` | `terminal` | `receipt`. `CF_ACCOUNT_ID` if your token sees more than one account.
 

@@ -163,7 +163,7 @@ export default {
   async fetch(req, env) {
     const path = new URL(req.url).pathname;
     if (path === "/favicon.ico") return new Response(null, { status: 204 });
-    if (path === "/try") return html(tryPage());
+    if (path === "/" || path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
     if (path === "/try/demo") return demo(new URL(req.url));
     if (!authed(req, env)) return new Response("Login required", { status: 401, headers: { "WWW-Authenticate": "Basic realm=\"cf-cost\"" } });
@@ -171,7 +171,7 @@ export default {
     try {
       const d = await data(env);
       if (url.pathname === '/api/data') return Response.json(d);
-      if (url.pathname !== '/') return new Response('Not found', { status: 404 });
+      if (url.pathname !== '/me') return new Response('Not found', { status: 404 });
       const t = TEMPLATES[url.searchParams.get("t")] || TEMPLATES[env.TEMPLATE] || ledger;
       return new Response(t(summarize(d)), { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
     } catch (e) {

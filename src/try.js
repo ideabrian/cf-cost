@@ -19,7 +19,7 @@ a.btn,button{display:inline-block;background:var(--accent);color:#fff;border:0;b
 button:disabled{opacity:.6;cursor:wait}
 input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:14px ui-monospace,Menlo,monospace}
 .looks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.looks label{border:2px solid var(--line);border-radius:8px;cursor:pointer;overflow:hidden;display:grid;font-size:14px;text-align:center}
+.looks label{position:relative;border:2px solid var(--line);border-radius:8px;cursor:pointer;overflow:hidden;display:grid;font-size:14px;text-align:center}
 .looks label span{padding:6px}.looks input{position:absolute;opacity:0}
 .looks label:has(input:checked){border-color:var(--accent);color:var(--accent);font-weight:600}
 .looks label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
