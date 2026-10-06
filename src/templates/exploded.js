@@ -48,8 +48,8 @@ export function diagram(s, { cta = '' } = {}) {
   else items.push(...rest);
   if (s.domains?.length) items.push({ name: 'Domain renewals', cost: s.renew12 / 12, note: `${money(s.renew12)} next 12 mo` });
   const max = Math.max(1, ...items.map(i => i.cost));
-  const rows = Math.ceil(items.length / 2), top = 90, H = top + rows * 100 + 230;
-  const cy = H - 120; // cloud center
+  const rows = Math.ceil(items.length / 2), top = 90, H = top + rows * 100 + 200;
+  const cy = H - 105; // cloud center (cloud drawn at 62% so the total, not the cloud, carries the weight)
   const parts = items.map((it, i) => {
     const side = i % 2 ? 'R' : 'L', row = Math.floor(i / 2), ly = top + row * 100;
     const lx = side === 'L' ? 24 : 760;
@@ -65,10 +65,9 @@ export function diagram(s, { cta = '' } = {}) {
   const total = s.base + s.overage;
   const count = items.length + (rest.length > 1 ? rest.length - 1 : 0);
   const svg = `<svg viewBox="0 0 1000 ${H}" data-h="${H}" data-cy="${cy}" role="img" aria-label="Exploded diagram of this Cloudflare bill: ${count} charges, ${money(total)} a month">
-<g class="cl" opacity=".22"><path transform="translate(0 ${cy - 570})" d="M720 690H300a80 80 0 0 1-9-159.5A118 118 0 0 1 497 482a96 96 0 0 1 158 61A76 76 0 0 1 720 690z" fill="var(--cloud)"/></g>
-<g class="sum"><text x="500" y="${cy + 20}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="30" fill="var(--cloud)">YOUR BILL</text>
-<text x="500" y="${cy + 66}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="44" fill="var(--ink)">${money(total)}<tspan font-size="20" fill="var(--dim)"> / mo</tspan></text></g>
-${cta ? `<text class="cta" x="500" y="${cy + 40}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="40" fill="#fff">${esc(cta)}</text>` : ''}
+<g class="cl" opacity=".22"><path transform="translate(500 ${cy}) scale(.62) translate(-508 -542)" d="M720 690H300a80 80 0 0 1-9-159.5A118 118 0 0 1 497 482a96 96 0 0 1 158 61A76 76 0 0 1 720 690z" fill="var(--cloud)"/></g>
+<g class="sum"><text x="500" y="${cy + 26}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="44" fill="var(--ink)">${money(total)}<tspan font-size="20" fill="var(--dim)"> / mo</tspan></text></g>
+${cta ? `<text class="cta" x="500" y="${cy + 22}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="27" fill="#fff">${esc(cta)}</text>` : ''}
 ${parts}
 </svg>`;
   return { svg, count, total };

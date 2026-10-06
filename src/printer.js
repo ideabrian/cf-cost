@@ -76,7 +76,7 @@ $('prPng').onclick=async()=>{try{await document.fonts.ready}catch(_){}const W=10
  L('TOTAL / MO',D.total,'700 38px '+MONO);if(D.renew)L('Domains, next 12 mo',D.renew,'500 22px '+MONO);hr();
  x.save();x.translate(W/2,y+30);x.rotate(-.1);const col=D.stamp==='PAID'?'#c2341b':'#1f8a3a';x.strokeStyle=col;x.fillStyle=col;x.globalAlpha=.85;x.lineWidth=6;x.font='40px "Bowlby One", Impact, sans-serif';const sw=x.measureText(D.stamp).width+44;x.strokeRect(-sw/2,-34,sw,68);x.textAlign='center';x.fillText(D.stamp,0,14);x.restore();y+=130;
  C('THANK YOU FOR SHIPPING','700 26px '+MONO);
- x.restore();x.font='60px "Bowlby One", Impact, sans-serif';x.fillStyle='#fff';x.textAlign='center';x.fillText('What does Cloudflare charge you?',W/2,95,W-80);x.font='500 34px '+MONO;x.fillText('cfcost.com',W/2,H-50);
+ x.restore();x.font='60px "Bowlby One", Impact, sans-serif';x.fillStyle='#fff';x.textAlign='center';x.fillText('What does Cloudflare cost you?',W/2,95,W-80);x.font='500 34px '+MONO;x.fillText('cfcost.com',W/2,H-50);
  $('prImg').src=c.toDataURL('image/png');$('prShare').hidden=false};
 })();`;
   return { html, js };

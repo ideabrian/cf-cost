@@ -176,7 +176,7 @@ function redact(d) {
 }
 async function brian(req, env, ctx) {
   const url = new URL(req.url), t = TEMPLATES[url.searchParams.get('t')] ? url.searchParams.get('t') : 'exploded';
-  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=12'); // bump v to bust cache after template changes
+  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=13'); // bump v to bust cache after template changes
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
   try { h = brand(TEMPLATES[t](summarize({ ...redact(await data(env)), serverToken: true }))); }
@@ -190,7 +190,7 @@ async function brian(req, env, ctx) {
 
 // Landing: tap-the-cloud intro built from Brian's real (redacted) bill. Whole page cached 1h; falls back to plain page.
 async function landing(env, ctx) {
-  const key = new Request('https://cfcost.com/?landing&v=8');
+  const key = new Request('https://cfcost.com/?landing&v=9');
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
   try { const b = summarize({ ...redact(await data(env)), serverToken: true }); h = tryPage({ ...diagram(b, { cta: 'TAP TO FIND OUT' }), printer: printer(b, { who: '@brianball' }) }); }

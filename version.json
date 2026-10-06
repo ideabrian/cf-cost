@@ -1,7 +1,12 @@
 {
-  "build": 10,
-  "lastUpdated": "2026-10-06T19:04:37Z",
+  "build": 11,
+  "lastUpdated": "2026-10-06T19:14:10Z",
   "changelog": [
+    {
+      "build": 11,
+      "date": "2026-10-06",
+      "changes": "\"What does Cloudflare cost me?\" on one line; smaller cloud, no YOUR BILL label"
+    },
     {
       "build": 10,
       "date": "2026-10-06",
