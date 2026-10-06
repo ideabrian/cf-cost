@@ -83,7 +83,7 @@ $('prPng').onclick=async()=>{try{await document.fonts.ready}catch(_){}const W=10
 }
 
 export const PRINTER_CSS = `.printer{justify-self:center;width:min(560px,100%);display:grid;justify-items:center;--paper:#fdfbf5;--pink:#22201c}
-.pr-bar{width:100%;display:flex;align-items:center;gap:12px;background:#111;color:#e9e6df;border-radius:18px 18px 0 0;padding:8px 8px 8px 16px;font:500 12px "DM Mono",ui-monospace,monospace;letter-spacing:.08em}
+.pr-bar{width:100%;display:flex;align-items:center;gap:12px;background:#111;color:#e9e6df;border-radius:18px;padding:16px 10px 16px 16px;font:500 12px "DM Mono",ui-monospace,monospace;letter-spacing:.08em}
 .pr-safe{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0;padding:6px 0}
 .pr-safe[hidden]{display:none}
 .led{width:10px;height:10px;border-radius:50%;background:#3ddc84;box-shadow:0 0 6px #3ddc84,0 0 14px #3ddc84;animation:glow 2.4s ease-in-out infinite;flex:none}
@@ -91,10 +91,10 @@ export const PRINTER_CSS = `.printer{justify-self:center;width:min(560px,100%);d
 .pr-go{margin-left:auto;font:500 13px "DM Mono",monospace;color:#111;background:#3ddc84;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap;letter-spacing:.02em}
 .pr-go[disabled]{opacity:.5;cursor:default}
 .pr-safe:focus-visible,.pr-go:focus-visible,.pr-png:focus-visible,.pr-slip:focus-visible{outline:2px solid #3ddc84;outline-offset:3px}
-.pr-slot{width:100%;height:18px;background:linear-gradient(#141414,#1e1e1e);border-radius:0 0 18px 18px;position:relative}
-.pr-slot::after{content:"";position:absolute;left:12%;right:12%;top:7px;height:4px;border-radius:4px;background:#000;box-shadow:0 0 0 1px #2a2a2a,0 0 14px var(--glow,transparent);transition:box-shadow .4s}
+.pr-slot{width:100%;height:0;position:relative}
+.pr-slot::after{content:"";position:absolute;left:12%;right:12%;top:-7px;height:3px;border-radius:3px;background:#000;box-shadow:0 0 0 1px #2a2a2a,0 0 14px var(--glow,transparent);transition:box-shadow .4s}
 .pr-slot.live{--glow:#3ddc8499}
-.pr-feed{margin:-9px auto 0;width:min(84%,400px);height:0;overflow:hidden;position:relative;z-index:2;text-align:left}
+.pr-feed{margin:-7px auto 0;width:min(84%,400px);height:0;overflow:hidden;position:relative;z-index:2;text-align:left}
 .pr-slip{background:var(--paper);color:var(--pink);font:13px/1.55 "DM Mono",ui-monospace,monospace;padding:20px 20px 26px;position:relative;touch-action:none;user-select:none;background-image:repeating-linear-gradient(0deg,transparent 0 3px,#00000006 3px 4px);box-shadow:0 18px 30px #0005}
 .pr-slip.grab{cursor:grab}
 .pr-row{display:flex;justify-content:space-between;gap:12px}.pr-row>span{min-width:0;overflow-wrap:anywhere}.pr-row>span:last-child{text-align:right;white-space:nowrap}
