@@ -25,6 +25,7 @@ Commands: `npm run deploy` (= `cf deploy`, Cloudflare CLI, reads `cloudflare.con
 URL: https://cfcost.com (custom domain attached in CF dash/API, deliberately NOT in wrangler.jsonc so forks/Deploy-button users don't try to claim it; survives deploys; www.cfcost.com also attached (once, via wrangler --domain), 301 → apex)
 
 Brand: src/brand.js (logo, /favicon.svg, title prefix "CF Cost", footer "not affiliated with Cloudflare" on every dashboard render).
+Promo video: `promo/make-video.sh [voice]` → promo/out/exploded.mp4 (Kokoro TTS + Playwright recording of /try/demo?t=exploded + ffmpeg; out/ gitignored).
 Account: auto-detected from token unless CF_ACCOUNT_ID set. Onboarding page: src/try.js. Templates: src/templates/{ledger,terminal,receipt,exploded}.js (exploded = SVG exploded-view; fixed-gutter layout so labels never collide), pick via ?t= or TEMPLATE var.
 Notes: invoice API returns no amount for invoices before 2025-06 (shown as —). No line items via API; large one-offs ≈ domain registrations.
 Domains: /registrar/domains (needs Registrar Domains Read; panel shows hint if missing). Renewal price per TLD via POST /registrar/domain-check on a made-up name.
