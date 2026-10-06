@@ -17,6 +17,7 @@ h1{margin:0;font-size:2rem;letter-spacing:-.02em;line-height:1.15}p{margin:0}.di
 ol{margin:0;padding:0;list-style:none;display:grid;gap:12px}
 li{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:10px}
 li b{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+a.btn.alt{background:transparent;color:var(--accent);border:2px solid var(--accent);padding:8px 14px}
 a.btn,button{display:inline-block;background:var(--accent);color:#fff;border:0;border-radius:6px;padding:10px 16px;font:600 15px system-ui;text-decoration:none;cursor:pointer;justify-self:start}
 button:disabled{opacity:.6;cursor:wait}
 input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg);font:14px ui-monospace,Menlo,monospace}
@@ -42,7 +43,11 @@ input{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;bac
 <small class="dim">Pick a look. <a href="/try/demo" target="_blank" style="color:var(--accent)">See a full sample ↗</a></small>
 <button id="go">Show my bill</button><p id="err" role="alert"></p></form></li>
 </ol>
-<p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. Prefer your own copy? <a href="https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost" style="color:var(--accent)">Deploy it to your account in one click</a> (<a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">open source</a>).<br>CF Cost is an independent tool, not affiliated with Cloudflare.</small></p>
+<section style="background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:10px">
+<b style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim)">Or run your own copy</b>
+<p>Deploy CF Cost to your Cloudflare account. Your token never leaves your account, and the dashboard is behind your own password at <code>/me</code>.</p>
+<a class="btn alt" href="https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost" target="_blank" rel="noopener">Deploy to Cloudflare ↗</a></section>
+<p class="dim"><small>The token stays in this browser tab. Our worker uses it to call Cloudflare's API for each page load, then discards it: no database, no logs. Close the tab and it's gone. <a href="https://github.com/ideabrian/cf-cost" style="color:var(--accent)">Open source</a>.<br>CF Cost is an independent tool, not affiliated with Cloudflare.</small></p>
 </main>
 <script>
 const K='cfcost_token',f=document.getElementById('f'),err=document.getElementById('err'),go=document.getElementById('go');

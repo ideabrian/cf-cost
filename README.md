@@ -14,7 +14,7 @@ Three looks, switch with `?t=`:
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/ideabrian/cf-cost)
 
-It asks for a token (link to a pre-filled read-only one included) and a password, then deploys to your account.
+It asks for a token (link to a pre-filled read-only one included) and a password, then deploys to your account. Your dashboard is at `/me` on the new worker's URL.
 
 ## Install (2 minutes, with Claude Code)
 

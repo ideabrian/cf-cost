@@ -5,10 +5,10 @@
   "cloudflare": {
     "bindings": {
       "CF_BILLING_TOKEN": {
-        "description": "Read-only API token. [Create it pre-filled here](https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22billing%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22registrar_domains%22%2C%22type%22%3A%22read%22%7D%5D&name=cf-cost&accountId=*&zoneId=all), click **Continue to summary** \u2192 **Create Token**, paste it."
+        "description": "Read-only API token. [Create it pre-filled here](https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22billing%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22registrar_domains%22%2C%22type%22%3A%22read%22%7D%5D&name=cf-cost&accountId=*&zoneId=all), click **Continue to summary** → **Create Token**, paste it."
       },
       "DASH_PASSWORD": {
-        "description": "Any password you like. You'll log in with any username + this password."
+        "description": "Any password you like. After deploy, open `/me` on your worker's URL and log in with any username + this password. (`/` is the public paste-a-token page.)"
       },
       "TEMPLATE": {
         "description": "Look: `ledger`, `terminal`, or `receipt`. Change anytime with `?t=`."
