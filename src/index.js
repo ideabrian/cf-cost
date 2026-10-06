@@ -163,8 +163,31 @@ async function guest(req, env) {
   }
 }
 
+
+// Public "Brian's bill": the owner's real numbers, names hidden, cached 1h so visitors never hit the billing API directly.
+const BRIAN_BANNER = `<div style="position:sticky;top:0;z-index:9;background:#111;color:#fff;text-align:center;font:600 14px system-ui;padding:8px 16px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3ddc84;box-shadow:0 0 8px #3ddc84;margin-right:8px"></span>Brian's real Cloudflare bill, live (refreshed hourly; names hidden). <a href="/" style="color:#3ddc84">See yours →</a></div>`;
+function redact(d) {
+  const tld = n => (n.match(/\.[a-z.]+$/i) || [''])[0];
+  return { ...d,
+    invoices: d.invoices.map((i, k) => ({ ...i, receipt: 'INV-' + String(k + 1).padStart(3, '0') })),
+    buckets: d.buckets && d.buckets.map((b, k) => ({ ...b, bucket: 'bucket-' + (k + 1) })),
+    domains: d.domains && d.domains.map((x, k) => ({ ...x, name: 'domain-' + (k + 1) + tld(x.name) })) };
+}
+async function brian(req, env, ctx) {
+  const url = new URL(req.url), t = TEMPLATES[url.searchParams.get('t')] ? url.searchParams.get('t') : 'exploded';
+  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=5'); // bump v to bust cache after template changes
+  const hit = await caches.default.match(key); if (hit) return hit;
+  let h;
+  try { h = brand(TEMPLATES[t](summarize(redact(await data(env))))); }
+  catch (e) { return new Response('Brian\'s bill is unavailable right now. Try the sample instead: /try/demo', { status: 502 }); }
+  h = h.replace(/href="\/api\/data"/g, 'href="/"').replace(/href="\?t=/g, 'href="/brian?t=').replace(/<body([^>]*)>/, '<body$1>' + BRIAN_BANNER).replace('Your bill, exploded', 'Brian\'s bill, exploded');
+  const res = new Response(h, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });
+  ctx.waitUntil(caches.default.put(key, res.clone()));
+  return res;
+}
+
 export default {
-  async fetch(req, env) {
+  async fetch(req, env, ctx) {
     const u0 = new URL(req.url);
     if (u0.hostname === "www.cfcost.com") { u0.hostname = "cfcost.com"; return Response.redirect(u0.toString(), 301); }
     const path = u0.pathname;
@@ -174,6 +197,7 @@ export default {
     if (path === "/" || path === "/try") return html(tryPage());
     if (path === "/try/render") return guest(req, env);
     if (path === "/try/demo") return demo(new URL(req.url));
+    if (path === "/brian") return brian(req, env, ctx);
     if (!authed(req, env)) return new Response("Login required", { status: 401, headers: { "WWW-Authenticate": "Basic realm=\"cf-cost\"" } });
     const adm = await chatAdmin(req, env, path); if (adm) return adm;
     const url = new URL(req.url);

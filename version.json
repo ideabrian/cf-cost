@@ -1,7 +1,12 @@
 {
-  "build": 4,
-  "lastUpdated": "2026-10-06T17:58:42Z",
+  "build": 5,
+  "lastUpdated": "2026-10-06T18:10:05Z",
   "changelog": [
+    {
+      "build": 5,
+      "date": "2026-10-06",
+      "changes": "Public /brian: owner's real bill, names redacted, cached 1h; fix safety panel always open; fix meters without free tier"
+    },
     {
       "build": 4,
       "date": "2026-10-06",

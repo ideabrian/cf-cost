@@ -34,7 +34,7 @@ const clip = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 export default function exploded(s) {
   const items = [
     ...s.plans.filter(p => p.price > 0).map(p => ({ name: p.name, cost: p.price, note: `${money(p.price)} / mo plan` })),
-    ...s.meters.map(m => ({ name: short(m.service), cost: m.cost, note: m.cost > 0 ? `${money(m.cost)} · ${num(m.used)} ${m.unit}` : `$0 · ${num(m.used)} of ${num(m.included)} free (${(m.pct * 100).toFixed(0)}%)` })),
+    ...s.meters.map(m => ({ name: short(m.service), cost: m.cost, note: m.cost > 0 || m.included == null ? `${money(m.cost)} · ${num(m.used || 0)} ${m.unit}` : `$0 · ${num(m.used || 0)} of ${num(m.included)} free (${((m.pct || 0) * 100).toFixed(0)}%)` })),
   ];
   if (s.domains?.length) items.push({ name: 'Domain renewals', cost: s.renew12 / 12, note: `${money(s.renew12)} next 12 mo` });
   const max = Math.max(1, ...items.map(i => i.cost));
@@ -83,7 +83,7 @@ button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;bord
 .led{width:10px;height:10px;border-radius:50%;background:#3ddc84;box-shadow:0 0 6px #3ddc84,0 0 14px #3ddc84;animation:glow 2.4s ease-in-out infinite;flex:none}
 @keyframes glow{50%{box-shadow:0 0 3px #3ddc84,0 0 6px #3ddc84;opacity:.75}}
 .bar a{color:#111;background:#e9e6df;text-decoration:none;border-radius:999px;padding:6px 14px;white-space:nowrap}
-.safe{justify-self:center;width:min(560px,100%);background:#111;color:#e9e6df;border-radius:16px;padding:18px 20px;display:grid;gap:12px;font-size:13px}
+.safe[hidden]{display:none}.safe{justify-self:center;width:min(560px,100%);background:#111;color:#e9e6df;border-radius:16px;padding:18px 20px;display:grid;gap:12px;font-size:13px}
 .safe h2{margin:0;font:400 20px "Bowlby One",Impact,sans-serif;color:#3ddc84}
 .safe dl{margin:0;display:grid;gap:10px}.safe dt{font-weight:500;color:#fff}.safe dd{margin:2px 0 0;color:#b9b5ab}
 .safe a{color:#3ddc84}.safe button{justify-self:start;font:500 13px "DM Mono",monospace;background:#3ddc84;color:#111;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
