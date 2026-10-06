@@ -17,11 +17,11 @@ Copy the prompt in [SETUP-PROMPT.md](SETUP-PROMPT.md) into Claude Code. It opens
 ## Install by hand
 
 1. Create a token from this pre-filled link (read-only Billing, Analytics, Workers, D1, R2):
-   https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22billing%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22read%22%7D%5D&name=cf-cost&accountId=*&zoneId=all
+   https://dash.cloudflare.com/profile/api-tokens?permissionGroupKeys=%5B%7B%22key%22%3A%22billing%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22account_analytics%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_scripts%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22d1%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22workers_r2%22%2C%22type%22%3A%22read%22%7D%2C%7B%22key%22%3A%22registrar_domains%22%2C%22type%22%3A%22read%22%7D%5D&name=cf-cost&accountId=*&zoneId=all
 2. `npx degit ideabrian/cf-cost cf-cost && cd cf-cost`
 3. `npx wrangler deploy`
 4. `npx wrangler secret put CF_BILLING_TOKEN` (paste token) and `npx wrangler secret put DASH_PASSWORD`
-5. Optional, for the domains panel: edit the token and add **Account → Registrar: Domains → Read**.
+5. Domains panel needs Registrar: Domains → Read (the link above includes it; older tokens: edit and add it).
 6. Open `https://cf-cost.<you>.workers.dev`. Any username, your password.
 
 Options (`wrangler.jsonc` vars): `TEMPLATE` = `ledger` | `terminal` | `receipt`. `CF_ACCOUNT_ID` if your token sees more than one account.
