@@ -42,6 +42,6 @@ ${s.invoices.slice(0, 18).map(i => row(esc(i.date) + ' ' + esc(i.receipt), i.amo
 <div class="hr"></div>
 <div class="c">THANK YOU FOR SHIPPING</div>
 <div class="bc"></div>
-<div class="c dim" style="margin-top:12px"><a href="?t=ledger">ledger</a> · <a href="?t=terminal">terminal</a> · <a href="?t=receipt">receipt</a></div>
+<div class="c dim" style="margin-top:12px"><a href="?t=ledger">ledger</a> · <a href="?t=terminal">terminal</a> · <a href="?t=receipt">receipt</a> · <a href="?t=exploded">exploded</a></div>
 </div></body></html>`;
 }

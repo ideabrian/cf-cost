@@ -4,11 +4,12 @@ import { summarize } from "./lib.js";
 import ledger from "./templates/ledger.js";
 import terminal from "./templates/terminal.js";
 import receipt from "./templates/receipt.js";
+import exploded from "./templates/exploded.js";
 import tryPage from "./try.js";
 import { sample } from "./sample.js";
 import { brand, FAVICON_SVG } from "./brand.js";
 
-const TEMPLATES = { ledger, terminal, receipt };
+const TEMPLATES = { ledger, terminal, receipt, exploded };
 const API = 'https://api.cloudflare.com/client/v4/accounts/';
 
 // Account comes from CF_ACCOUNT_ID, or the first account the token can see.

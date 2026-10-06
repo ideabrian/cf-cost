@@ -48,6 +48,6 @@ ${s.domains.map(x => `<div class="ln ${x.days <= 60 ? 'y' : ''}">${esc(pad(x.nam
 <div class="sec scroll"><div class="h">── invoices ${'─'.repeat(37)}</div>
 ${s.invoices.map(i => `<div class="ln ${i.amount >= 25 ? 'y' : ''}">${esc(i.date)}  ${esc(pad(i.receipt, 12))}  ${i.amount == null ? '       —' : money(i.amount).padStart(8)}</div>`).join('')}</div>
 <p class="sec">$ <span class="cur"></span></p>
-<p class="d">themes: <a href="?t=ledger">ledger</a> · <a href="?t=terminal">terminal</a> · <a href="?t=receipt">receipt</a> · <a href="/api/data">json</a></p>
+<p class="d">themes: <a href="?t=ledger">ledger</a> · <a href="?t=terminal">terminal</a> · <a href="?t=receipt">receipt</a> · <a href="?t=exploded">exploded</a> · <a href="/api/data">json</a></p>
 </div></body></html>`;
 }

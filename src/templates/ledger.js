@@ -44,6 +44,6 @@ ${!s.domains ? `<section class="card"><h2>Domains</h2><p class="dim" style="marg
 <section class="card"><h2>Invoices</h2><p class="dim" style="margin:0 0 8px">Large one-offs are usually domain registrations/renewals. Line items: dashboard → Billing → Invoices.</p><table><tr><th>Date</th><th>Receipt</th><th class="r">Amount</th></tr>
 ${d.invoices.map(i => `<tr${i.amount >= 25 ? ' class="warn"' : ''}><td class="mono">${esc(i.date)}</td><td class="mono dim">${esc(i.receipt)}</td><td class="r mono">${i.amount == null ? "<span class=dim>—</span>" : money(i.amount)}</td></tr>`).join('')}
 </table></section>
-<p class="dim">Look: <a href="?t=ledger" style="color:var(--accent)">ledger</a> · <a href="?t=terminal" style="color:var(--accent)">terminal</a> · <a href="?t=receipt" style="color:var(--accent)">receipt</a> · <a href="/api/data" style="color:var(--accent)">JSON</a></p>
+<p class="dim">Look: <a href="?t=ledger" style="color:var(--accent)">ledger</a> · <a href="?t=terminal" style="color:var(--accent)">terminal</a> · <a href="?t=receipt" style="color:var(--accent)">receipt</a> · <a href="?t=exploded" style="color:var(--accent)">exploded</a> · <a href="/api/data" style="color:var(--accent)">JSON</a></p>
 </div></body></html>`;
 }

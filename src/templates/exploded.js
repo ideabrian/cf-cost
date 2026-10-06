@@ -1,0 +1,93 @@
+import { esc, money, num, short } from '../lib.js';
+
+// Exploded: your bill as an exploded-view diagram. Every charge bursts out of the orange cloud, labeled.
+// Layout can't collide: labels live only in two fixed gutters (x<250, x>750), one per 100px row, clipped to fit;
+// icons live only in the middle band; leader lines stop at the icon edge nearest the label; cloud is drawn first.
+
+const ICONS = {
+  coin: c => `<circle r="30" fill="${c}"/><text y="11" text-anchor="middle" font-family="Bowlby One,Impact" font-size="30" fill="#fff">$</text>`,
+  bars: c => `<g fill="${c}"><rect x="-26" y="-4" width="12" height="24"/><rect x="-8" y="-16" width="12" height="36"/><rect x="10" y="-28" width="12" height="48"/></g>`,
+  clock: c => `<circle r="22" fill="var(--bg)" stroke="${c}" stroke-width="5"/><path d="M0 0V-13M0 0L9 6" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`,
+  db: c => `<g fill="${c}"><ellipse cy="-14" rx="20" ry="7"/><rect x="-20" y="-14" width="40" height="28"/><ellipse cy="14" rx="20" ry="7"/></g><path d="M-20 -2a20 7 0 0 0 40 0" stroke="#fff" stroke-width="2" fill="none" opacity=".6"/>`,
+  bucket: c => `<path d="M-22 -16h44l-7 36h-30z" fill="${c}"/><ellipse cy="-16" rx="22" ry="6" fill="${c}" stroke="#fff" stroke-width="1.5"/>`,
+  key: c => `<g fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"><circle cx="-14" r="11"/><path d="M-3 0h30M18 0v9M26 0v7"/></g>`,
+  chip: c => `<rect x="-20" y="-20" width="40" height="40" rx="6" fill="${c}"/><text y="6" text-anchor="middle" font-family="DM Mono,monospace" font-size="14" font-weight="500" fill="#fff">AI</text><path d="M-10 -27v7M0 -27v7M10 -27v7M-10 20v7M0 20v7M10 20v7" stroke="${c}" stroke-width="3"/>`,
+  box: c => `<path d="M0 -22l22 11v22l-22 11-22-11v-22z" fill="${c}"/><path d="M-22 -11l22 11 22-11M0 0v22" stroke="#fff" stroke-width="1.5" fill="none" opacity=".6"/>`,
+  globe: c => `<circle r="22" fill="none" stroke="${c}" stroke-width="5"/><path d="M-22 0h44M0 -22c-12 12-12 32 0 44M0 -22c12 12 12 32 0 44" stroke="${c}" stroke-width="3" fill="none"/>`,
+};
+function pick(name) {
+  const n = name.toLowerCase();
+  if (/cpu/.test(n)) return ['clock', '#9b6bd6'];
+  if (/d1/.test(n)) return ['db', /writ/.test(n) ? '#d8402b' : '#2f9e6e'];
+  if (/r2/.test(n)) return ['bucket', /class a/.test(n) ? '#a8261a' : '#e9b04a'];
+  if (/kv/.test(n)) return ['key', '#6b8e23'];
+  if (/durable/.test(n)) return ['box', '#2a7ab0'];
+  if (/request/.test(n)) return ['bars', '#4a8fe7'];
+  if (/domain|registrar/.test(n)) return ['globe', '#3a8f8f'];
+  if (/\bai\b|neuron/.test(n)) return ['chip', '#c2341b'];
+  return ['coin', '#f38020'];
+}
+const clip = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
+
+export default function exploded(s) {
+  const items = [
+    ...s.plans.filter(p => p.price > 0).map(p => ({ name: p.name, cost: p.price, note: `${money(p.price)} / mo plan` })),
+    ...s.meters.map(m => ({ name: short(m.service), cost: m.cost, note: m.cost > 0 ? `${money(m.cost)} · ${num(m.used)} ${m.unit}` : `$0 · ${num(m.used)} of ${num(m.included)} free (${(m.pct * 100).toFixed(0)}%)` })),
+  ];
+  if (s.domains?.length) items.push({ name: 'Domain renewals', cost: s.renew12 / 12, note: `${money(s.renew12)} next 12 mo` });
+  const max = Math.max(1, ...items.map(i => i.cost));
+  const rows = Math.ceil(items.length / 2), top = 90, H = top + rows * 100 + 230;
+  const cy = H - 120; // cloud center
+  const parts = items.map((it, i) => {
+    const side = i % 2 ? 'R' : 'L', row = Math.floor(i / 2), ly = top + row * 100;
+    const lx = side === 'L' ? 24 : 760;
+    const ix = side === 'L' ? (row % 2 ? 340 : 410) : (row % 2 ? 660 : 590), iy = ly - 10 + (row % 2) * 12;
+    const sc = it.cost > 0 ? (0.95 + 0.5 * it.cost / max).toFixed(2) : 0.8;
+    const edge = 38 * sc, sx = side === 'L' ? ix - edge : ix + edge;
+    const name = clip(it.name, 25), note = clip(it.note, 34);
+    const ex = side === 'L' ? lx + Math.max(name.length * 9, note.length * 7.3) + 8 : lx - 8;
+    const [k, c] = pick(it.name);
+    return `<g class="bit${it.cost > 0 ? '' : ' free'}" style="--i:${i};--dx:${500 - ix}px;--dy:${cy - iy}px"><g transform="translate(${ix} ${iy}) scale(${sc})">${ICONS[k](c)}</g></g>
+<g class="tag${it.cost > 0 ? ' paid' : ''}" style="--i:${i}"><path class="lead" d="M${ex.toFixed(0)} ${ly - 5} L${sx.toFixed(0)} ${iy}"/><circle class="dot" cx="${sx.toFixed(0)}" cy="${iy}" r="3"/><text class="lbl" x="${lx}" y="${ly}">${esc(name)}</text><text class="note" x="${lx}" y="${ly + 16}">${esc(note)}</text></g>`;
+  }).join('\n');
+  const total = s.base + s.overage;
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cloudflare Spend</title><meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#fbf6ec;--ink:#2a1d14;--dim:#8a7564;--line:#c9b49c;--cloud:#f38020;--bad:#c2341b;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d1611;--ink:#f6eadb;--dim:#b29c86;--line:#5a4636;--bad:#ff6b52;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1d1611;--ink:#f6eadb;--dim:#b29c86;--line:#5a4636;--bad:#ff6b52;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "DM Mono",ui-monospace,monospace}
+.w{max-width:1040px;margin:0 auto;padding:32px 16px 48px;display:grid;gap:12px}
+h1{font:400 clamp(32px,6vw,60px)/1 "Bowlby One",Impact,sans-serif;margin:0}
+.sub{color:var(--dim);margin:0}
+.fig{overflow-x:auto}.fig svg{display:block;width:100%;min-width:640px;height:auto}
+.lbl{font:500 15px "DM Mono",monospace;fill:var(--ink)}.note{font:12px "DM Mono",monospace;fill:var(--dim)}
+.paid .note{fill:var(--bad)}
+.lead{stroke:var(--line);stroke-width:1.3;fill:none;stroke-dasharray:3 4}.dot{fill:var(--ink)}
+.free{opacity:.45}
+.bit{animation:pop 1.1s cubic-bezier(.2,1.4,.4,1) both;animation-delay:calc(var(--i)*70ms)}
+.tag{animation:fade .5s ease both;animation-delay:calc(.7s + var(--i)*70ms)}
+@keyframes pop{from{transform:translate(var(--dx),var(--dy)) scale(.2) rotate(40deg)}}
+@keyframes fade{from{opacity:0}}
+.cl{animation:kick .5s ease-out both;transform-origin:500px ${cy + 60}px}
+@keyframes kick{0%{transform:scale(1.08,.9)}60%{transform:scale(.97,1.04)}}
+nav a,button{color:var(--ink)}
+button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.bit,.tag,.cl{animation:none}}
+</style></head><body><div class="w">
+<h1>Your bill, exploded</h1>
+<p class="sub">Period from ${esc(s.periodStart)}. ${items.length} charges. Red notes cost money; faded ones are still inside the free tier.</p>
+<button id="again" type="button">Detonate again</button>
+<div class="fig" id="fig"><svg viewBox="0 0 1000 ${H}" role="img" aria-label="Exploded diagram of this Cloudflare bill: ${items.length} charges, ${money(total)} a month">
+<g class="cl" opacity=".22"><path transform="translate(0 ${cy - 570})" d="M720 690H300a80 80 0 0 1-9-159.5A118 118 0 0 1 497 482a96 96 0 0 1 158 61A76 76 0 0 1 720 690z" fill="var(--cloud)"/></g>
+<text x="500" y="${cy + 20}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="30" fill="var(--cloud)">YOUR BILL</text>
+<text x="500" y="${cy + 66}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="44" fill="var(--ink)">${money(total)}<tspan font-size="20" fill="var(--dim)"> / mo</tspan></text>
+${parts}
+</svg></div>
+<nav class="sub"><a href="?t=ledger">ledger</a> · <a href="?t=terminal">terminal</a> · <a href="?t=receipt">receipt</a> · <a href="?t=exploded">exploded</a></nav>
+</div>
+<script>document.getElementById('again').onclick=()=>{const f=document.getElementById('fig'),h=f.innerHTML;f.innerHTML='';void f.offsetWidth;f.innerHTML=h}</script>
+</body></html>`;
+}
