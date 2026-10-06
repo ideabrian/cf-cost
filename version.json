@@ -1,7 +1,12 @@
 {
-  "build": 1,
-  "lastUpdated": "2026-10-06T16:59:02Z",
+  "build": 2,
+  "lastUpdated": "2026-10-06T17:48:13Z",
   "changelog": [
+    {
+      "build": 2,
+      "date": "2026-10-06",
+      "changes": "Exploded view template + narrated promo video"
+    },
     {
       "build": 1,
       "date": "2026-10-06",
