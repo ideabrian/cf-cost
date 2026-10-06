@@ -175,10 +175,10 @@ function redact(d) {
 }
 async function brian(req, env, ctx) {
   const url = new URL(req.url), t = TEMPLATES[url.searchParams.get('t')] ? url.searchParams.get('t') : 'exploded';
-  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=5'); // bump v to bust cache after template changes
+  const key = new Request('https://cfcost.com/brian?t=' + t + '&v=7'); // bump v to bust cache after template changes
   const hit = await caches.default.match(key); if (hit) return hit;
   let h;
-  try { h = brand(TEMPLATES[t](summarize(redact(await data(env))))); }
+  try { h = brand(TEMPLATES[t](summarize({ ...redact(await data(env)), serverToken: true }))); }
   catch (e) { return new Response('Brian\'s bill is unavailable right now. Try the sample instead: /try/demo', { status: 502 }); }
   h = h.replace(/href="\/api\/data"/g, 'href="/"').replace(/href="\?t=/g, 'href="/brian?t=').replace(/<body([^>]*)>/, '<body$1>' + BRIAN_BANNER).replace('Your bill, exploded', 'Brian\'s bill, exploded');
   const res = new Response(h, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'public, max-age=3600' } });

@@ -14,6 +14,7 @@ const ICONS = {
   key: c => `<g fill="none" stroke="${c}" stroke-width="6" stroke-linecap="round"><circle cx="-14" r="11"/><path d="M-3 0h30M18 0v9M26 0v7"/></g>`,
   chip: c => `<rect x="-20" y="-20" width="40" height="40" rx="6" fill="${c}"/><text y="6" text-anchor="middle" font-family="DM Mono,monospace" font-size="14" font-weight="500" fill="#fff">AI</text><path d="M-10 -27v7M0 -27v7M10 -27v7M-10 20v7M0 20v7M10 20v7" stroke="${c}" stroke-width="3"/>`,
   box: c => `<path d="M0 -22l22 11v22l-22 11-22-11v-22z" fill="${c}"/><path d="M-22 -11l22 11 22-11M0 0v22" stroke="#fff" stroke-width="1.5" fill="none" opacity=".6"/>`,
+  check: c => `<circle r="24" fill="${c}"/><path d="M-11 0l7 8 14-16" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
   globe: c => `<circle r="22" fill="none" stroke="${c}" stroke-width="5"/><path d="M-22 0h44M0 -22c-12 12-12 32 0 44M0 -22c12 12 12 32 0 44" stroke="${c}" stroke-width="3" fill="none"/>`,
 };
 function pick(name) {
@@ -32,10 +33,17 @@ const PROMPT = `Help me make a read-only Cloudflare API token for cfcost.com. Op
 const clip = (s, n) => s.length > n ? s.slice(0, n - 1) + '…' : s;
 
 export default function exploded(s) {
+  // Paid meters always show. Free ones: the 4 closest to their limit show, the rest fold into one "+N more" item.
+  const meter = m => ({ name: short(m.service), cost: m.cost, pct: m.pct || 0, note: m.cost > 0 || m.included == null ? `${money(m.cost)} · ${num(m.used || 0)} ${m.unit}` : `$0 · ${num(m.used || 0)} of ${num(m.included)} free (${((m.pct || 0) * 100).toFixed(0)}%)` });
+  const paid = s.meters.filter(m => m.cost > 0).map(meter);
+  const free = s.meters.filter(m => !(m.cost > 0)).map(meter).sort((a, b) => b.pct - a.pct);
+  const SHOW_FREE = 4, rest = free.slice(SHOW_FREE);
   const items = [
     ...s.plans.filter(p => p.price > 0).map(p => ({ name: p.name, cost: p.price, note: `${money(p.price)} / mo plan` })),
-    ...s.meters.map(m => ({ name: short(m.service), cost: m.cost, note: m.cost > 0 || m.included == null ? `${money(m.cost)} · ${num(m.used || 0)} ${m.unit}` : `$0 · ${num(m.used || 0)} of ${num(m.included)} free (${((m.pct || 0) * 100).toFixed(0)}%)` })),
+    ...paid, ...free.slice(0, SHOW_FREE),
   ];
+  if (rest.length > 1) items.push({ name: `+${rest.length} more, all free`, cost: 0, note: `each under ${Math.ceil(rest[0].pct * 100) || 1}% of its free tier`, icon: ['check', '#3a9a5b'] });
+  else items.push(...rest);
   if (s.domains?.length) items.push({ name: 'Domain renewals', cost: s.renew12 / 12, note: `${money(s.renew12)} next 12 mo` });
   const max = Math.max(1, ...items.map(i => i.cost));
   const rows = Math.ceil(items.length / 2), top = 90, H = top + rows * 100 + 230;
@@ -48,7 +56,7 @@ export default function exploded(s) {
     const edge = 38 * sc, sx = side === 'L' ? ix - edge : ix + edge;
     const name = clip(it.name, 25), note = clip(it.note, 34);
     const ex = side === 'L' ? lx + Math.max(name.length * 9, note.length * 7.3) + 8 : lx - 8;
-    const [k, c] = pick(it.name);
+    const [k, c] = it.icon || pick(it.name);
     return `<g class="bit${it.cost > 0 ? '' : ' free'}" style="--i:${i};--dx:${500 - ix}px;--dy:${cy - iy}px"><g transform="translate(${ix} ${iy}) scale(${sc})">${ICONS[k](c)}</g></g>
 <g class="tag${it.cost > 0 ? ' paid' : ''}" style="--i:${i}"><path class="lead" d="M${ex.toFixed(0)} ${ly - 5} L${sx.toFixed(0)} ${iy}"/><circle class="dot" cx="${sx.toFixed(0)}" cy="${iy}" r="3"/><text class="lbl" x="${lx}" y="${ly}">${esc(name)}</text><text class="note" x="${lx}" y="${ly + 16}">${esc(note)}</text></g>`;
   }).join('\n');
@@ -90,7 +98,7 @@ button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;bord
 @media (prefers-reduced-motion:reduce){.bit,.tag,.cl,.led{animation:none}}
 </style></head><body><div class="w">
 <h1>Your bill, exploded</h1>
-<p class="sub">Period from ${esc(s.periodStart)}. ${items.length} charges. Red notes cost money; faded ones are still inside the free tier.</p>
+<p class="sub">Period from ${esc(s.periodStart)}. ${items.length + (rest.length > 1 ? rest.length - 1 : 0)} charges. Red notes cost money; faded ones are still inside the free tier.</p>
 <button id="again" type="button">Detonate again</button>
 <div class="fig" id="fig"><svg viewBox="0 0 1000 ${H}" role="img" aria-label="Exploded diagram of this Cloudflare bill: ${items.length} charges, ${money(total)} a month">
 <g class="cl" opacity=".22"><path transform="translate(0 ${cy - 570})" d="M720 690H300a80 80 0 0 1-9-159.5A118 118 0 0 1 497 482a96 96 0 0 1 158 61A76 76 0 0 1 720 690z" fill="var(--cloud)"/></g>
@@ -98,10 +106,10 @@ button{justify-self:start;font:500 14px "DM Mono",monospace;background:none;bord
 <text x="500" y="${cy + 66}" text-anchor="middle" font-family="Bowlby One,Impact" font-size="44" fill="var(--ink)">${money(total)}<tspan font-size="20" fill="var(--dim)"> / mo</tspan></text>
 ${parts}
 </svg></div>
-<div class="bar"><button type="button" id="safeBtn" aria-expanded="false" aria-controls="safe"><i class="led"></i><span>READ-ONLY · NOTHING STORED</span></button><a href="?t=receipt">Receipt →</a></div>
+<div class="bar"><button type="button" id="safeBtn" aria-expanded="false" aria-controls="safe"><i class="led"></i><span>${s.serverToken ? 'READ-ONLY · TOKEN KEPT SECRET' : 'READ-ONLY · NOTHING STORED'}</span></button><a href="?t=receipt">Receipt →</a></div>
 <div class="safe" id="safe" hidden><h2>Why this is safe</h2><dl>
 <dt>Read-only token</dt><dd>It can view billing and usage. It can't change, deploy or delete anything in your account.</dd>
-<dt>Nothing stored</dt><dd>The token stays in this browser tab. Our worker uses it for one page load and forgets it: no database, no logs. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>
+${s.serverToken ? `<dt>Token kept secret</dt><dd>This page uses Brian's read-only token, stored server-side as an encrypted Cloudflare secret. Visitors never see it, and the page is cached so it's rarely used. Yours would work differently: it stays in your browser tab and is never stored. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>` : `<dt>Nothing stored</dt><dd>The token stays in this browser tab. Our worker uses it for one page load and forgets it: no database, no logs. <a href="https://github.com/ideabrian/cf-cost">Read the code</a>.</dd>`}
 <dt>Share the picture, not the token</dt><dd>Post this diagram anywhere; what you spend on Cloudflare is nobody's secret. Keep the token itself private, since anyone holding it can read your invoices and domain list.</dd>
 <dt>Let your AI make the token</dt><dd>Paste this into Claude (or any agent that can use your browser).</dd></dl>
 <button type="button" id="copyPrompt">Copy prompt</button></div>
