@@ -2,7 +2,7 @@
 import { chromium } from 'playwright';
 import { renameSync, writeFileSync } from 'node:fs';
 const dur = +process.env.DUR, out = process.env.OUT;
-const b = await chromium.launch();
+const b = await chromium.launch({ channel: 'chrome' });
 const ctx = await b.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1, recordVideo: { dir: out, size: { width: 1280, height: 720 } } });
 const t0 = Date.now();
 const p = await ctx.newPage();
